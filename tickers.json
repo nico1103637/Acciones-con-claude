@@ -1,0 +1,307 @@
+[
+ {
+  "ticker": "NVDA",
+  "sector": "Tecnología",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "ADBE",
+  "sector": "Tecnología",
+  "origen": "Tu lista",
+  "multiplo": 14,
+  "margen_seg": 15,
+  "tesis": "P/E futuro de 8.8 y FCF yield de 11.5% para un negocio con 89% de margen bruto.",
+  "riesgo": "El mercado teme que la IA generativa erosione su base; consenso en 'Mantener'."
+ },
+ {
+  "ticker": "CTSH",
+  "sector": "Tecnología",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "WDAY",
+  "sector": "Tecnología",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "NOC",
+  "sector": "Industrial",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "META",
+  "sector": "Comunicación",
+  "origen": "Sugerida"
+ },
+ {
+  "ticker": "GOOGL",
+  "sector": "Comunicación",
+  "origen": "Sugerida"
+ },
+ {
+  "ticker": "MSFT",
+  "sector": "Tecnología",
+  "origen": "Sugerida"
+ },
+ {
+  "ticker": "NOW",
+  "sector": "Tecnología",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "TME",
+  "sector": "Tecnología",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "PLTR",
+  "sector": "Tecnología",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "CMCSA",
+  "sector": "Telecom",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "NVO",
+  "sector": "Salud",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "PDD",
+  "sector": "Tecnología",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "FISV",
+  "sector": "Servicios financieros",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "CRM",
+  "sector": "Tecnología",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "PYPL",
+  "sector": "Servicios comerciales",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "GEHC",
+  "sector": "Salud",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "VICI",
+  "sector": "Inmobiliario",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "CME",
+  "sector": "Financiero",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "NFLX",
+  "sector": "Tecnología",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "MLI",
+  "sector": "Industrial",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "LDOS",
+  "sector": "Tecnología",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "SYF",
+  "sector": "Financiero",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "AU",
+  "sector": "Materiales",
+  "origen": "Tu lista",
+  "multiplo": 10,
+  "margen_seg": 25,
+  "tesis": "Minera de oro con márgenes y caja récord, deuda baja.",
+  "riesgo": "Su utilidad depende del precio del oro; operaciones en África."
+ },
+ {
+  "ticker": "PAAS",
+  "sector": "Materiales",
+  "origen": "Tu lista",
+  "multiplo": 12,
+  "margen_seg": 25,
+  "tesis": "Plata y oro con crecimiento fuerte de producción y balance limpio.",
+  "riesgo": "Muy sensible al precio de la plata (beta 1.6); operaciones en Latinoamérica."
+ },
+ {
+  "ticker": "FOX",
+  "sector": "Comunicación",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "ACN",
+  "sector": "Tecnología",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "PTC",
+  "sector": "Tecnología",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "TMUS",
+  "sector": "Comunicación",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "SSNC",
+  "sector": "Tecnología",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "PAA",
+  "sector": "Energía",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "AGI",
+  "sector": "Materiales",
+  "origen": "Tu lista",
+  "multiplo": 14,
+  "margen_seg": 25,
+  "tesis": "Minera de oro canadiense de bajo costo con producción en expansión (EPS +33%).",
+  "riesgo": "Depende del oro; FCF yield bajo (2.3%) mientras invierte en expansión."
+ },
+ {
+  "ticker": "AMKR",
+  "sector": "Tecnología",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "ORCL",
+  "sector": "Tecnología",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "NXPI",
+  "sector": "Semiconductores",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "PODD",
+  "sector": "Salud",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "CRUS",
+  "sector": "Semiconductores",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "FSLR",
+  "sector": "Energía",
+  "origen": "Tu lista",
+  "multiplo": 12,
+  "margen_seg": 20,
+  "tesis": "Líder solar en EE.UU. sin deuda; EPS crecería ~34% el próximo año.",
+  "riesgo": "Depende de créditos fiscales y aranceles; precio bajo sus medias móviles."
+ },
+ {
+  "ticker": "NXT",
+  "sector": "Energía",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "NBIX",
+  "sector": "Salud",
+  "origen": "Tu lista",
+  "multiplo": 18,
+  "margen_seg": 15,
+  "tesis": "Cumple tus 11 filtros; Ingrezza genera caja creciente y el EPS crecería ~17% el próximo año.",
+  "riesgo": "Biotech con alta dependencia de un solo fármaco; tendencia técnica bajista (bajo sus medias)."
+ },
+ {
+  "ticker": "EXEL",
+  "sector": "Salud",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "GRAB",
+  "sector": "Tecnología",
+  "origen": "Tu lista"
+ },
+ {
+  "ticker": "APP",
+  "sector": "Tecnología",
+  "origen": "Tu lista",
+  "multiplo": 20,
+  "margen_seg": 25,
+  "tesis": "Márgenes de 77% operativo y EPS creciendo >30%; cayó 52% desde máximos.",
+  "riesgo": "Beta 2.6, muy volátil; tendencia bajista fuerte y riesgo regulatorio/reputacional."
+ },
+ {
+  "ticker": "AMZN",
+  "sector": "Consumo",
+  "origen": "Sugerida"
+ },
+ {
+  "ticker": "MU",
+  "sector": "Semiconductores",
+  "origen": "Sugerida",
+  "multiplo": 6,
+  "margen_seg": 25,
+  "tesis": "Ganancias récord por la demanda de memoria para IA; P/E futuro de 5.4.",
+  "riesgo": "Cíclica en pico: +425% en 12 meses; si el ciclo gira, el EPS cae fuerte. Rango de analistas enorme (361–3000)."
+ },
+ {
+  "ticker": "QCOM",
+  "sector": "Semiconductores",
+  "origen": "Sugerida"
+ },
+ {
+  "ticker": "AMAT",
+  "sector": "Semiconductores",
+  "origen": "Sugerida"
+ },
+ {
+  "ticker": "KLAC",
+  "sector": "Semiconductores",
+  "origen": "Sugerida"
+ },
+ {
+  "ticker": "DECK",
+  "sector": "Consumo",
+  "origen": "Sugerida",
+  "multiplo": 13,
+  "margen_seg": 20,
+  "tesis": "HOKA y UGG con ROIC muy alto y sin deuda; P/E futuro de 11.",
+  "riesgo": "Moda/consumo: desaceleración de HOKA o aranceles presionan márgenes."
+ },
+ {
+  "ticker": "CROX",
+  "sector": "Consumo",
+  "origen": "Sugerida"
+ },
+ {
+  "ticker": "MELI",
+  "sector": "Consumo",
+  "origen": "Sugerida"
+ },
+ {
+  "ticker": "UBER",
+  "sector": "Tecnología",
+  "origen": "Sugerida",
+  "multiplo": 20,
+  "margen_seg": 15,
+  "tesis": "Flujo de caja libre creciente y EPS +31% estimado; P/E futuro de 17.7.",
+  "riesgo": "Competencia de robotaxis (Waymo, Tesla) y liquidez corriente baja."
+ }
+]
