@@ -35,6 +35,17 @@ def latest(path):
     return out
 
 
+def compact(path):
+    """Reescribe un .jsonl dejando una sola línea (la combinada más reciente) por ticker."""
+    p = os.path.join(HERE, path)
+    if not os.path.exists(p):
+        return
+    data = latest(path)
+    with open(p, "w", encoding="utf-8") as f:
+        for t in sorted(data):
+            f.write(json.dumps(data[t], ensure_ascii=False) + "\n")
+
+
 def num(v):
     try:
         return None if v is None or v == "" else float(v)
@@ -136,6 +147,9 @@ def plan(a, cfg, fc, tc):
 
 def main():
     cfg = {t["ticker"]: t for t in json.load(open(os.path.join(HERE, "tickers.json"), encoding="utf-8"))}
+    if "--need" not in sys.argv:
+        for f in ("raw/stats.jsonl", "raw/fin.jsonl", "raw/forecast.jsonl", "raw/tech.jsonl"):
+            compact(f)
     st, fi, fcs, tcs = latest("raw/stats.jsonl"), latest("raw/fin.jsonl"), latest("raw/forecast.jsonl"), latest("raw/tech.jsonl")
     rows = []
     for t, c in cfg.items():
