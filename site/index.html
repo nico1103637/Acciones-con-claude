@@ -11,13 +11,13 @@
 :root{
   --bg:#0d1117;--panel:#151b23;--panel2:#1b222c;--line:#283140;--fg:#e6edf3;--muted:#8b98a8;
   --ok:#3fb950;--ok-bg:rgba(63,185,80,.16);--warn:#d29922;--warn-bg:rgba(210,153,34,.16);--bad:#f85149;--bad-bg:rgba(248,81,73,.16);
-  --accent:#58a6ff;--zone:rgba(63,185,80,.35);--risk:rgba(248,81,73,.28);--track:#2a3340;
+  --accent:#58a6ff;--est:rgba(88,166,255,.18);--zone:rgba(63,185,80,.35);--risk:rgba(248,81,73,.28);--track:#2a3340;
   --mono:"IBM Plex Mono",ui-monospace,monospace;--sans:"IBM Plex Sans",system-ui,sans-serif;--r:10px;
 }
 @media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
   --bg:#f6f8fa;--panel:#ffffff;--panel2:#f3f5f8;--line:#d8dee4;--fg:#1f2328;--muted:#59636e;
   --ok:#1a7f37;--ok-bg:rgba(26,127,55,.12);--warn:#9a6700;--warn-bg:rgba(154,103,0,.12);--bad:#cf222e;--bad-bg:rgba(207,34,46,.1);
-  --accent:#0969da;--zone:rgba(26,127,55,.3);--risk:rgba(207,34,46,.2);--track:#e3e8ee;}}
+  --accent:#0969da;--est:rgba(9,105,218,.14);--zone:rgba(26,127,55,.3);--risk:rgba(207,34,46,.2);--track:#e3e8ee;}}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%}
 .wrap{max-width:1180px;margin:0 auto;padding:20px 16px 48px}
@@ -97,6 +97,38 @@ tr:hover td{background:var(--panel2)}
 a{color:var(--accent)}
 .foot{color:var(--muted);font-size:.75rem;margin-top:22px}
 .err{color:var(--bad)}
+/* vistas de columnas y proyección */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;background:transparent;color:var(--muted);padding:6px 12px;font-size:.8rem}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--panel2);color:var(--fg);font-weight:600}
+#tbl .c-f,#tbl .c-p,#tbl .c-x{display:none}
+#tbl.view-f .c-f,#tbl.view-p .c-p,#tbl.view-x .c-x,#tbl.view-t .c-f,#tbl.view-t .c-p,#tbl.view-t .c-x{display:table-cell}
+th .hs{display:block;font-weight:400;font-size:.64rem;opacity:.8}
+td small{color:var(--muted);font-size:.68rem;margin-left:4px}
+td.warn{color:var(--warn)}
+tr.row{cursor:pointer}
+tr.row.open td{background:var(--panel2)}
+tr.det td{white-space:normal;text-align:left;font-family:var(--sans);background:var(--panel2);padding:4px 12px 14px}
+tr.det td:first-child{position:static}
+.pj{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px 22px;position:sticky;left:12px;width:min(1000px,calc(var(--tw,100vw) - 26px))}
+@media (max-width:760px){.pj{grid-template-columns:minmax(0,1fr)}}
+.pj h3{font-size:.82rem;margin:8px 0 4px;font-weight:600}
+.pj p{margin:4px 0;font-size:.82rem;max-width:62ch}
+.pj .lg{display:flex;gap:14px;font-size:.72rem;color:var(--muted);margin:2px 0 4px}
+.pj .lg i{display:inline-block;width:12px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.pj .lg .r{background:var(--accent)}.pj .lg .e{border:1.5px dashed var(--accent);background:var(--est)}
+.fcfc{width:100%;max-width:560px;height:auto;display:block}
+.fcfc .lbl{font-size:10px;fill:var(--muted);font-family:var(--mono)}
+.fcfc .val{font-size:10px;fill:var(--fg);font-family:var(--mono)}
+.fcfc .hit{fill:transparent}
+.fcfc g.col:hover .hit{fill:var(--line);fill-opacity:.35}
+.readout{font-family:var(--mono);font-size:.75rem;color:var(--muted);min-height:1.2em}
+.eq{width:auto;font-size:.78rem;border:1px solid var(--line);border-radius:6px}
+.eq th,.eq td{position:static!important;padding:4px 8px;background:transparent!important;font-size:.76rem}
+.eq th{cursor:default}
+.tag{font-size:.68rem;font-weight:600;padding:1px 7px;border-radius:999px;white-space:nowrap}
+.t-ok{background:var(--ok-bg);color:var(--ok)}.t-warn{background:var(--warn-bg);color:var(--warn)}.t-bad{background:var(--bad-bg);color:var(--bad)}
 </style>
 </head>
 <body>
@@ -124,50 +156,28 @@ a{color:var(--accent)}
 
   <section class="card" id="ranking">
     <h2>Ranking completo con tus parámetros</h2>
-    <p class="note">Puntaje 0–100: tus 11 filtros valen 50 y el complemento (P/E futuro, FCF yield, crecimiento estimado y potencial) otros 50. Las marcas ✓/✗ usan tus valores originales; los límites de abajo solo filtran la lista.</p>
+    <p class="note">Puntaje 0–100: tus 11 filtros valen 50 y el complemento (P/E futuro, FCF yield, crecimiento estimado y potencial) otros 50. En <b>Mis filtros</b> ves el valor real de cada parámetro (✓ cumple, ✗ no cumple). En <b>Proyección</b> ves los estimados de los próximos trimestres y del flujo de caja libre. Toca una empresa para ver su proyección trimestre a trimestre.</p>
     <div class="filters">
       <label>Buscar<input id="q" type="search" placeholder="Ticker o empresa"></label>
       <label>Sector<select id="f-sector"><option value="">Todos</option></select></label>
       <label>Origen<select id="f-origen"><option value="">Todas</option><option>Tu lista</option><option>Sugerida</option></select></label>
       <label>Veredicto<select id="f-ver"><option value="">Todos</option><option>Candidata fuerte</option><option>Vigilar</option><option>No cumple</option></select></label>
+      <label>Tendencia FCF<select id="f-tend"><option value="">Todas</option><option>Creciendo</option><option>Estable</option><option>Cayendo</option><option>Negativo</option></select></label>
       <label>P/E máximo<input id="f-pe" type="number" step="1" min="0" placeholder="20"></label>
       <label>PEG máximo<input id="f-peg" type="number" step="0.1" min="0" placeholder="2"></label>
       <label>ROI mínimo %<input id="f-roi" type="number" step="1" placeholder="15"></label>
       <label>Filtros cumplidos mín.<input id="f-min" type="number" step="1" min="0" max="11" placeholder="0"></label>
     </div>
     <div class="bar">
-      <label><input type="checkbox" id="all"> Ver todas las columnas</label>
+      <div class="seg" role="group" aria-label="Columnas">
+        <button type="button" data-v="f" aria-pressed="true">Mis filtros</button><button type="button" data-v="p" aria-pressed="false">Proyección</button><button type="button" data-v="t" aria-pressed="false">Todo</button>
+      </div>
       <button id="reset" type="button">Restablecer</button>
       <span id="count"></span>
     </div>
     <div class="tw" id="tw">
-      <table id="tbl">
-        <thead><tr>
-          <th class="l" data-k="ticker">Ticker</th>
-          <th data-k="puntaje">Puntaje</th>
-          <th data-k="cumple">Filtros</th>
-          <th class="l" data-k="veredicto">Veredicto</th>
-          <th data-k="precio">Precio</th>
-          <th data-k="pe">P/E</th>
-          <th data-k="pe_fwd">P/E fut.</th>
-          <th data-k="peg">PEG</th>
-          <th data-k="roic">ROI %</th>
-          <th data-k="potencial">Potencial %</th>
-          <th class="ext l" data-k="empresa">Empresa</th>
-          <th class="ext l" data-k="sector">Sector</th>
-          <th class="ext" data-k="cap_b">Cap (B)</th>
-          <th class="ext" data-k="current_ratio">Liquidez</th>
-          <th class="ext" data-k="deuda_patrimonio_pct">D/P %</th>
-          <th class="ext" data-k="chk_ventas">Ventas↑</th>
-          <th class="ext" data-k="chk_utilidad">Utilidad↑</th>
-          <th class="ext" data-k="chk_margen">Margen↑</th>
-          <th class="ext" data-k="chk_eps">EPS↑</th>
-          <th class="ext" data-k="chk_fcf">FCF↑</th>
-          <th class="ext" data-k="chk_div">Div.</th>
-          <th class="ext" data-k="fcf_yield">FCF yield %</th>
-          <th class="ext" data-k="crec_eps_est">EPS est. %</th>
-          <th class="ext l" data-k="recomendacion">Analistas</th>
-        </tr></thead>
+      <table id="tbl" class="view-f">
+        <thead><tr id="thead"></tr></thead>
         <tbody></tbody>
       </table>
     </div>
@@ -183,7 +193,8 @@ a{color:var(--accent)}
       <li>Dividendo: informativo, no resta</li>
     </ol>
     <p><b>Plan de entrada:</b> valor justo = promedio de (EPS del próximo año × múltiplo justificado) y la mediana de precio objetivo de analistas. Entrada 1 = el menor entre el precio y el valor justo menos el margen de seguridad (15% estables, 20% beta alta, 25% cíclicas, mineras o beta &gt; 2). Entrada 2 = soporte técnico más cercano (media 50/200 días o mínimo de 52 semanas). Stop 8% bajo la entrada 2. Horizonte 12 meses.</p>
-    <p><b>Actualización:</b> cada día hábil antes de la apertura, con datos de stockanalysis.com (precio, valoración, estimados y precios objetivo). Los estados financieros se refrescan los lunes. Finviz y Koyfin no permiten lectura automática; úsalos para validar: <a href="https://finviz.com/screener.ashx?v=111&amp;f=cap_largeover,fa_curratio_o1.5,fa_epsyoy_pos,fa_netmargin_pos,fa_pe_u20,fa_peg_u2,fa_roi_o15,fa_salesqoq_pos&amp;o=-marketcap" target="_blank" rel="noopener">screener de Finviz con tus filtros</a> · <a href="https://app.koyfin.com/home" target="_blank" rel="noopener">Koyfin</a>.</p>
+    <p><b>Proyección:</b> el FCF trimestral real sale del estado de flujo de caja trimestral; el FCF estimado del año fiscal y los estimados de ventas, utilidad y EPS son el consenso que publica stockanalysis.com. El <i>FCF por trimestre faltante</i> = (FCF estimado del año − FCF ya reportado en el año) ÷ trimestres que faltan; si es mucho mayor que el ritmo reciente, el estimado exige una aceleración. Tendencia FCF: creciendo si el estimado del año sube ≥10% contra el anterior, estable entre −5% y +10%, cayendo por debajo de −5%. El EPS por trimestre es el consenso de MarketBeat (muestra cuántos analistas lo cubren; con 1 o 2 es poco confiable). No hay estimados públicos de FCF por trimestre; para eso usa Koyfin.</p>
+    <p><b>Actualización:</b> cada día hábil antes de la apertura, con datos de stockanalysis.com (precio, valoración, estimados y precios objetivo). Los estados financieros se refrescan los lunes; la proyección, cada semana y después de cada reporte trimestral. Finviz y Koyfin no permiten lectura automática; úsalos para validar: <a href="https://finviz.com/screener.ashx?v=111&amp;f=cap_largeover,fa_curratio_o1.5,fa_epsyoy_pos,fa_netmargin_pos,fa_pe_u20,fa_peg_u2,fa_roi_o15,fa_salesqoq_pos&amp;o=-marketcap" target="_blank" rel="noopener">screener de Finviz con tus filtros</a> · <a href="https://app.koyfin.com/home" target="_blank" rel="noopener">Koyfin</a>.</p>
     <p class="muted">Herramienta de análisis, no asesoría financiera. Empresas extranjeras (TME, PDD, NVO) reportan en moneda local.</p>
   </section>
   <div class="foot" id="foot"></div>
@@ -254,56 +265,227 @@ a{color:var(--accent)}
     for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) { const s = el('span', null, (v > 0 ? '+' : '') + v + '%'); s.style.left = X(v); ticks.append(s); }
   }
 
+  // ---------- tabla: columnas por vista ----------
+  const SYM = { USD: '$', CNY: '¥', DKK: 'kr ', EUR: '€' };
+  const money = (v, cur) => {
+    if (n(v) === null) return NA;
+    const x = +v, s = x < 0 ? '−' : '', a = Math.abs(x), c = SYM[cur || 'USD'] ?? (cur + ' ');
+    return s + c + (a >= 1000 ? fx(a / 1000, a >= 100000 ? 0 : 1) + 'B' : fx(a, a >= 100 ? 0 : 1) + 'M');
+  };
+  const sgn = (v, d = 1) => (n(v) === null ? NA : (v > 0 ? '+' : v < 0 ? '−' : '') + fx(Math.abs(v), d) + '%');
+  const fdate = (s) => { if (!s) return NA; const d = new Date(s + 'T12:00:00Z'); return isNaN(d) ? s : d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', timeZone: 'UTC' }).replace('.', '').replace(' de ', ' '); };
+  const qshort = (q) => (q ? q.replace(/^Q(\d) (\d{2})(\d{2})$/, 'T$1 ’$3').replace(/^H(\d) (\d{2})(\d{2})$/, 'S$1 ’$3') : '');
+  const mark = (ok) => (ok ? '✓ ' : '✗ ');
+  const chk = (ok, text) => [mark(ok) + text, ok ? 'ok' : 'bad'];
+  const tendCls = (t) => (t === 'Creciendo' ? 't-ok' : t === 'Estable' ? 't-warn' : t ? 't-bad' : '');
+
+  // [clave de orden, encabezado, subtítulo, vista, render(a) -> [texto, clase] | Node, alineado izq.]
+  const COLS = [
+    ['ticker', 'Ticker', '', 'b', (a) => [a.ticker, 'l'], true],
+    ['puntaje', 'Puntaje', '', 'b', (a) => { const td = el('td'); td.append(el('span', 'score badge ' + verClass(a.veredicto), a.puntaje)); return td; }],
+    ['cumple', 'Filtros', '', 'b', (a) => [a.cumple + '/11', a.cumple === 11 ? 'ok' : '']],
+    // tus 11 parámetros
+    ['cap_b', 'Cap.', '> 10B', 'f', (a) => chk(a.chk_cap, n(a.cap_b) === null ? NA : fx(a.cap_b, a.cap_b >= 100 ? 0 : 1) + 'B')],
+    ['crec_ventas', 'Ventas', '+ y creciendo', 'f', (a) => chk(a.chk_ventas, a.crec_ventas === null ? 'vs neg.' : sgn(a.crec_ventas))],
+    ['crec_utilidad', 'Utilidad neta', '+ y creciendo', 'f', (a) => chk(a.chk_utilidad, a.crec_utilidad === null ? (a.chk_utilidad ? 'vs neg.' : 'neg.') : sgn(a.crec_utilidad))],
+    ['margen_fy0', 'Margen neto', '+ y creciendo', 'f', (a) => chk(a.chk_margen, n(a.margen_fy0) === null ? NA : fx(a.margen_fy0, 1) + '% ' + (a.delta_margen >= 0 ? '▲' : '▼') + fx(Math.abs(a.delta_margen ?? 0), 1))],
+    ['crec_eps', 'EPS', '+ y creciendo', 'f', (a) => chk(a.chk_eps, a.crec_eps === null ? (a.chk_eps ? 'vs neg.' : 'neg.') : sgn(a.crec_eps))],
+    ['pe', 'P/E', '≤ 20', 'f', (a) => chk(a.chk_pe, fx(a.pe, 1))],
+    ['peg', 'PEG', '≤ 2', 'f', (a) => chk(a.chk_peg, fx(a.peg, 2))],
+    ['crec_fcf', 'FCF', '+ y creciendo', 'f', (a) => chk(a.chk_fcf, a.crec_fcf === null ? (a.chk_fcf ? 'vs neg.' : 'neg.') : sgn(a.crec_fcf))],
+    ['roic', 'ROI', '> 15%', 'f', (a) => chk(a.chk_roi, n(a.roic) === null ? NA : fx(a.roic, 1) + '%')],
+    ['current_ratio', 'Liquidez', '> 1.5', 'f', (a) => chk(a.chk_cr, fx(a.current_ratio, 2))],
+    ['deuda_patrimonio_pct', 'Deuda/patr.', '< 200%', 'f', (a) => chk(a.chk_de, n(a.deuda_patrimonio_pct) === null ? NA : fx(a.deuda_patrimonio_pct, 0) + '%')],
+    ['chk_div', 'Dividendo', 'extra', 'f', (a) => [a.chk_div ? 'Sí' : 'No', 'c ' + (a.chk_div ? 'ok' : 'na')]],
+    // proyección
+    ['prox_reporte', 'Próx. reporte', '* fecha estimada', 'p', (a) => [fdate(a.prox_reporte) + (a.prox_reporte && !a.reporte_confirmado ? '*' : ''), a.prox_reporte ? '' : 'na']],
+    ['eps_q1', 'EPS próx. trim.', 'consenso', 'p', (a) => epsCell(a.eps_q1, a.eps_q1_lbl, a.eps_q1_n)],
+    ['eps_q2', 'EPS trim. sig.', 'consenso', 'p', (a) => epsCell(a.eps_q2, a.eps_q2_lbl, a.eps_q2_n)],
+    ['ventas_est_crec', 'Ventas est.', 'año vs ant.', 'p', (a) => [sgn(a.ventas_est_crec), clsSign(a.ventas_est_crec)]],
+    ['eps_est_fy_crec', 'EPS est.', 'año vs ant.', 'p', (a) => [sgn(a.eps_est_fy_crec), clsSign(a.eps_est_fy_crec)]],
+    ['fcf_ttm', 'FCF real', 'últ. 12 meses', 'p', (a) => [money(a.fcf_ttm, a.q_moneda), n(a.fcf_ttm) === null ? 'na' : a.fcf_ttm < 0 ? 'bad' : '']],
+    ['fcf_ult_aa', 'FCF últ. trim.', 'vs año ant.', 'p', (a) => [sgn(a.fcf_ult_aa, 0), clsSign(a.fcf_ult_aa)]],
+    ['fcf_est', 'FCF est.', 'año fiscal', 'p', (a) => [money(a.fcf_est, a.q_moneda), n(a.fcf_est) === null ? 'na' : a.fcf_est < 0 ? 'bad' : '']],
+    ['fcf_est_crec', 'FCF est.', 'vs año ant.', 'p', (a) => [sgn(a.fcf_est_crec), clsSign(a.fcf_est_crec)]],
+    ['fcf_impl_trim', 'FCF faltante', 'por trimestre', 'p', (a) => [money(a.fcf_impl_trim, a.q_moneda), n(a.fcf_impl_trim) === null ? 'na' : a.fcf_exigencia > 1.5 ? 'warn' : '']],
+    ['fcf_tend', 'Tendencia FCF', '', 'p', (a) => { const td = el('td', 'l txt'); if (a.fcf_tend) td.append(el('span', 'tag ' + tendCls(a.fcf_tend), a.fcf_tend)); else { td.textContent = NA; td.classList.add('na'); } return td; }, true],
+    // resto
+    ['veredicto', 'Veredicto', '', 'x', (a) => [a.veredicto, 'l txt'], true],
+    ['precio', 'Precio', '', 'x', (a) => [usd(a.precio), '']],
+    ['pe_fwd', 'P/E fut.', '', 'x', (a) => [fx(a.pe_fwd, 1), '']],
+    ['potencial', 'Potencial', 'precio obj.', 'x', (a) => [sgn(a.potencial), n(a.potencial) === null ? 'na' : a.potencial >= 15 ? 'ok' : '']],
+    ['fcf_yield', 'FCF yield', '', 'x', (a) => [n(a.fcf_yield) === null ? NA : fx(a.fcf_yield, 1) + '%', '']],
+    ['crec_eps_est', 'EPS est.', 'crec. %', 'x', (a) => [fx(a.crec_eps_est, 1), '']],
+    ['recomendacion', 'Analistas', '', 'x', (a) => [a.recomendacion ?? NA, 'l txt'], true],
+    ['empresa', 'Empresa', '', 'x', (a) => [a.empresa, 'l txt'], true],
+    ['sector', 'Sector', '', 'x', (a) => [a.sector, 'l txt'], true],
+  ];
+  const TEXT_KEYS = ['ticker', 'empresa', 'sector', 'veredicto', 'recomendacion', 'fcf_tend', 'prox_reporte'];
+  function clsSign(v) { return n(v) === null ? 'na' : v >= 0 ? 'ok' : 'bad'; }
+  function epsCell(v, lbl, cnt) {
+    const td = el('td', n(v) === null ? 'na' : cnt !== null && cnt <= 1 ? 'warn' : '');
+    td.textContent = n(v) === null ? NA : fx(v, 2);
+    if (lbl) td.append(el('small', null, qshort(lbl) + (cnt ? ' · ' + cnt + 'a' : '')));
+    if (cnt !== null && cnt <= 1) td.title = 'Solo ' + cnt + ' analista: poco confiable';
+    return td;
+  }
+  let view = 'f';
+  const openRows = new Set();
+
   function setupTable() {
     const secs = [...new Set(D.acciones.map((a) => a.sector))].sort();
     const sel = $('#f-sector'); secs.forEach((s) => sel.append(new Option(s, s)));
-    ['#q', '#f-sector', '#f-origen', '#f-ver', '#f-pe', '#f-peg', '#f-roi', '#f-min'].forEach((s) => $(s).addEventListener('input', drawTable));
-    $('#all').addEventListener('change', (e) => $('#tw').classList.toggle('showall', e.target.checked));
-    $('#reset').addEventListener('click', () => { ['#q', '#f-sector', '#f-origen', '#f-ver', '#f-pe', '#f-peg', '#f-roi', '#f-min'].forEach((s) => ($(s).value = '')); drawTable(); });
-    document.querySelectorAll('#tbl th').forEach((th) => th.addEventListener('click', () => {
-      const k = th.dataset.k; if (sortK === k) sortD = -sortD; else { sortK = k; sortD = ['ticker', 'empresa', 'sector', 'veredicto', 'recomendacion'].includes(k) ? 1 : -1; } drawTable();
-    }));
+    const hr = $('#thead');
+    COLS.forEach(([k, lbl, sub, v, , left]) => {
+      const th = el('th', (left ? 'l ' : '') + (v === 'b' ? '' : 'c-' + v));
+      th.dataset.k = k; th.append(document.createTextNode(lbl));
+      if (sub) th.append(el('span', 'hs', sub));
+      th.addEventListener('click', () => { if (sortK === k) sortD = -sortD; else { sortK = k; sortD = TEXT_KEYS.includes(k) ? 1 : -1; } drawTable(); });
+      hr.append(th);
+    });
+    const F = ['#q', '#f-sector', '#f-origen', '#f-ver', '#f-tend', '#f-pe', '#f-peg', '#f-roi', '#f-min'];
+    F.forEach((s) => $(s).addEventListener('input', drawTable));
+    $('#reset').addEventListener('click', () => { F.forEach((s) => ($(s).value = '')); drawTable(); });
+    try { const sv = localStorage.getItem('screener_vista'); if (['f', 'p', 't'].includes(sv)) view = sv; } catch (e) {}
+    document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => { view = b.dataset.v; try { localStorage.setItem('screener_vista', view); } catch (e) {} applyView(); }));
+    const setW = () => $('#tbl').style.setProperty('--tw', $('#tw').clientWidth + 'px');
+    setW(); addEventListener('resize', setW);
+    applyView();
+  }
+  function applyView() {
+    $('#tbl').className = 'view-' + view;
+    document.querySelectorAll('.seg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === view ? 'true' : 'false'));
   }
 
   function drawTable() {
-    const q = $('#q').value.trim().toLowerCase(), sec = $('#f-sector').value, ori = $('#f-origen').value, ver = $('#f-ver').value;
+    const q = $('#q').value.trim().toLowerCase(), sec = $('#f-sector').value, ori = $('#f-origen').value, ver = $('#f-ver').value, tend = $('#f-tend').value;
     const pe = n($('#f-pe').value), peg = n($('#f-peg').value), roi = n($('#f-roi').value), mn = n($('#f-min').value);
-    let L = D.acciones.filter((a) => (!q || (a.ticker + ' ' + a.empresa).toLowerCase().includes(q)) && (!sec || a.sector === sec) && (!ori || a.origen === ori) && (!ver || a.veredicto === ver)
+    let L = D.acciones.filter((a) => (!q || (a.ticker + ' ' + a.empresa).toLowerCase().includes(q)) && (!sec || a.sector === sec) && (!ori || a.origen === ori) && (!ver || a.veredicto === ver) && (!tend || a.fcf_tend === tend)
       && (pe === null || (n(a.pe) !== null && a.pe > 0 && a.pe <= pe)) && (peg === null || (n(a.peg) !== null && a.peg > 0 && a.peg <= peg))
       && (roi === null || (n(a.roic) !== null && a.roic >= roi)) && (mn === null || a.cumple >= mn));
     L.sort((x, y) => {
       const a = x[sortK], b = y[sortK];
       if (typeof a === 'boolean' || typeof b === 'boolean') return sortD * ((a ? 1 : 0) - (b ? 1 : 0));
-      if (typeof a === 'string' || typeof b === 'string') return sortD * String(a ?? '').localeCompare(String(b ?? ''));
-      if (n(a) === null) return 1; if (n(b) === null) return -1; return sortD * (a - b);
+      if (a === null || a === undefined) return 1; if (b === null || b === undefined) return -1;
+      if (typeof a === 'string' || typeof b === 'string') return sortD * String(a).localeCompare(String(b));
+      return sortD * (a - b);
     });
     document.querySelectorAll('#tbl th').forEach((th) => th.setAttribute('aria-sort', th.dataset.k === sortK ? (sortD > 0 ? 'ascending' : 'descending') : 'none'));
     $('#count').textContent = `${L.length} de ${D.acciones.length} acciones`;
     const tb = $('#tbl tbody'); tb.replaceChildren();
-    const td = (tr, t, c) => tr.append(el('td', c, t));
-    const lim = (tr, v, d, good, ext) => td(tr, fx(v, d), (ext ? 'ext ' : '') + (n(v) === null ? 'na' : good(+v) ? 'ok' : 'bad'));
-    const ck = (tr, v) => td(tr, v ? '✓' : '✗', 'ext c ' + (v ? 'ok' : 'bad'));
     L.forEach((a) => {
-      const tr = el('tr');
-      td(tr, a.ticker, 'l');
-      const sc = el('td'); const sp = el('span', 'score badge ' + verClass(a.veredicto), a.puntaje); sc.append(sp); tr.append(sc);
-      td(tr, a.cumple + '/11', a.cumple === 11 ? 'ok' : '');
-      td(tr, a.veredicto, 'l txt');
-      td(tr, usd(a.precio));
-      lim(tr, a.pe, 1, (v) => v > 0 && v <= 20);
-      td(tr, fx(a.pe_fwd, 1));
-      lim(tr, a.peg, 2, (v) => v > 0 && v <= 2);
-      lim(tr, a.roic, 1, (v) => v > 15);
-      td(tr, n(a.potencial) === null ? NA : (a.potencial > 0 ? '+' : '') + fx(a.potencial, 1), n(a.potencial) === null ? 'na' : a.potencial >= 15 ? 'ok' : '');
-      td(tr, a.empresa, 'ext l txt'); td(tr, a.sector, 'ext l txt');
-      lim(tr, a.cap_b, 1, (v) => v > 10, true);
-      lim(tr, a.current_ratio, 2, (v) => v > 1.5, true);
-      lim(tr, a.deuda_patrimonio_pct, 0, (v) => v < 200, true);
-      ck(tr, a.chk_ventas); ck(tr, a.chk_utilidad); ck(tr, a.chk_margen); ck(tr, a.chk_eps); ck(tr, a.chk_fcf);
-      td(tr, a.chk_div ? 'Sí' : 'No', 'ext c ' + (a.chk_div ? 'ok' : 'na'));
-      td(tr, fx(a.fcf_yield, 1), 'ext'); td(tr, fx(a.crec_eps_est, 1), 'ext'); td(tr, a.recomendacion ?? NA, 'ext l txt');
+      const tr = el('tr', 'row');
+      COLS.forEach(([, , , v, render]) => {
+        const r = render(a);
+        const td = r instanceof Node ? r : el('td', r[1] || '', r[0]);
+        if (v !== 'b') td.classList.add('c-' + v);
+        tr.append(td);
+      });
       tb.append(tr);
+      const det = el('tr', 'det'); const dtd = el('td'); dtd.colSpan = COLS.length; det.append(dtd);
+      const open = () => { tr.classList.add('open'); if (!dtd.firstChild) dtd.append(projPanel(a)); tb.insertBefore(det, tr.nextSibling); };
+      tr.addEventListener('click', () => { if (openRows.has(a.ticker)) { openRows.delete(a.ticker); tr.classList.remove('open'); det.remove(); } else { openRows.add(a.ticker); open(); } });
+      if (openRows.has(a.ticker)) open();
     });
+  }
+
+  // ---------- panel de proyección por empresa ----------
+  function projPanel(a) {
+    const box = el('div', 'pj');
+    const cur = a.q_moneda;
+    if (!a.fcf_hist || !a.fcf_hist.length) { box.append(el('p', 'muted', 'Aún no hay datos de proyección para ' + a.ticker + '. Se cargan en la próxima actualización.')); return box; }
+    const left = el('div'), right = el('div');
+    const per = a.periodos_anio === 2 ? 'semestre' : 'trimestre';
+    left.append(el('h3', null, 'Flujo de caja libre por ' + per + (cur !== 'USD' ? ' (' + cur + ', millones)' : '')));
+    const lg = el('div', 'lg');
+    const l1 = el('span'); l1.append(el('i', 'r'), document.createTextNode('Real')); lg.append(l1);
+    if (a.periodos_restantes && n(a.fcf_impl_trim) !== null) { const l2 = el('span'); l2.append(el('i', 'e'), document.createTextNode('Faltante para cumplir el estimado ' + (a.fy_est || ''))); lg.append(l2); }
+    left.append(lg);
+    const ro = el('div', 'readout', 'Toca una barra para ver el valor');
+    left.append(fcfChart(a, ro), ro);
+
+    // lectura del analista
+    const txt = [];
+    if (n(a.fcf_est) !== null) {
+      txt.push(`FCF estimado ${a.fy_est}: ${money(a.fcf_est, cur)} (${sgn(a.fcf_est_crec)} vs ${a.fy_prev}${a.analistas_fy ? ', ' + a.analistas_fy + ' analistas' : ''}).`);
+      if (a.periodos_restantes > 0 && n(a.fcf_ytd) !== null) {
+        let t = `En lo que va del año fiscal lleva ${money(a.fcf_ytd, cur)} en ${a.periodos_ytd} ${per}${a.periodos_ytd === 1 ? '' : 's'}; para cumplir el estimado necesita unos ${money(a.fcf_impl_trim, cur)} por ${per} en los ${a.periodos_restantes} que faltan`;
+        if (n(a.fcf_exigencia) !== null) t += ` (${fx(a.fcf_exigencia, 1)}× su promedio reciente)`;
+        txt.push(t + '.');
+        if (a.fcf_ytd < 0 && a.fcf_impl_trim > 0) txt.push('Lectura: el año va con caja negativa y el estimado supone que se dé la vuelta en lo que queda; es la apuesta clave a vigilar en el próximo reporte.');
+        else if (a.fcf_exigencia > 1.5) txt.push('Lectura: el estimado exige una aceleración fuerte del flujo de caja; si el próximo reporte no la muestra, es probable que los analistas recorten.');
+        else if (a.fcf_exigencia !== null && a.fcf_exigencia < 0.75) txt.push('Lectura: el estimado es conservador frente al ritmo actual; hay espacio para sorprender al alza.');
+        else if (a.fcf_exigencia !== null) txt.push('Lectura: el estimado es coherente con el ritmo de caja que ya muestra la empresa.');
+      } else if (a.periodos_restantes === 0 || a.periodos_ytd === 0) {
+        txt.push(`El año fiscal ${a.fy_est} recién empieza: el estimado equivale a ${money(a.fcf_impl_trim, cur)} por ${per}.`);
+      }
+    } else if (n(a.fcf_ttm) !== null) txt.push(`FCF de los últimos 12 meses: ${money(a.fcf_ttm, cur)} (${sgn(a.fcf_ttm_crec)} vs los 12 meses anteriores). Sin estimado público de FCF para el año.`);
+    if (a.fcf_est < 0) txt.push('El consenso espera FCF negativo este año (inversión fuerte o capital de trabajo): revisa la causa antes de comprar.');
+    txt.forEach((t) => left.append(el('p', null, t)));
+
+    right.append(el('h3', null, 'Estimados del año fiscal ' + (a.fy_est || '')));
+    const t1 = el('p');
+    t1.textContent = [
+      n(a.ventas_est) !== null ? `Ventas ${money(a.ventas_est, cur)} (${sgn(a.ventas_est_crec)})` : null,
+      n(a.util_est) !== null ? `utilidad neta ${money(a.util_est, cur)} (${sgn(a.util_est_crec)})` : null,
+      n(a.eps_est_fy) !== null ? `EPS ${fx(a.eps_est_fy, 2)} (${sgn(a.eps_est_fy_crec)})` : null,
+    ].filter(Boolean).join(' · ') || 'Sin estimados anuales.';
+    right.append(t1);
+    right.append(el('h3', null, 'EPS estimado por trimestre'));
+    if (a.eps_trim && a.eps_trim.length) {
+      const tb = el('table', 'eq'); const hr = el('tr');
+      ['Trimestre', 'EPS', 'Rango', 'Analistas'].forEach((h, i) => hr.append(el('th', i ? '' : 'l', h)));
+      tb.append(hr);
+      a.eps_trim.forEach((r) => {
+        const tr = el('tr');
+        tr.append(el('td', 'l', r.q), el('td', null, fx(r.eps, 2)), el('td', null, n(r.lo) === null ? NA : fx(r.lo, 2) + '–' + fx(r.hi, 2)), el('td', r.n <= 1 ? 'warn' : '', r.n ?? NA));
+        tb.append(tr);
+      });
+      right.append(tb);
+      if (a.eps_trim.some((r) => r.n <= 1)) right.append(el('p', 'muted', 'En amarillo: un solo analista, tómalo como referencia débil.'));
+    } else right.append(el('p', 'muted', 'Sin estimados trimestrales públicos.'));
+    if (a.prox_reporte) right.append(el('p', null, `Próximo reporte: ${fdate(a.prox_reporte)} ${a.reporte_confirmado ? '(confirmado)' : '(fecha estimada)'}.`));
+    if (cur !== 'USD') right.append(el('p', 'muted', `Cifras de caja en ${cur} (moneda de reporte); el EPS por trimestre está en dólares por ADR.`));
+    box.append(left, right);
+    return box;
+  }
+
+  function fcfChart(a, ro) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const mk = (t, at) => { const e = document.createElementNS(NS, t); for (const k in at) e.setAttribute(k, at[k]); return e; };
+    const hist = a.fcf_hist.filter((h) => n(h.fcf) !== null);
+    const est = [];
+    for (let i = 0; i < (a.periodos_restantes || 0) && n(a.fcf_impl_trim) !== null; i++) est.push({ q: 'est.', fcf: a.fcf_impl_trim, est: true });
+    const bars = [...hist, ...est];
+    const W = 360, H = 170, padT = 16, padB = 34, padL = 4, padR = 4;
+    const vals = bars.map((b) => b.fcf);
+    const hi = Math.max(0, ...vals), lo = Math.min(0, ...vals);
+    const Y = (v) => padT + (hi - v) / ((hi - lo) || 1) * (H - padT - padB);
+    const slot = (W - padL - padR) / bars.length, bw = Math.min(26, slot * 0.62);
+    const svg = mk('svg', { viewBox: `0 0 ${W} ${H}`, class: 'fcfc', role: 'img', 'aria-label': 'Flujo de caja libre por periodo de ' + a.ticker });
+    const y0 = Y(0);
+    const bar = (x, v, w) => { // extremo de dato redondeado, base recta en cero
+      const y1 = Y(v), r = Math.min(4, Math.abs(y1 - y0) / 2, w / 2);
+      if (v >= 0) return `M${x},${y0}V${y1 + r}Q${x},${y1} ${x + r},${y1}H${x + w - r}Q${x + w},${y1} ${x + w},${y1 + r}V${y0}Z`;
+      return `M${x},${y0}V${y1 - r}Q${x},${y1} ${x + r},${y1}H${x + w - r}Q${x + w},${y1} ${x + w},${y1 - r}V${y0}Z`;
+    };
+    bars.forEach((b, i) => {
+      const g = mk('g', { class: 'col' });
+      const cx = padL + slot * i + slot / 2, x = cx - bw / 2;
+      g.append(mk('rect', { class: 'hit', x: padL + slot * i, y: 0, width: slot, height: H - padB + 2, rx: 4 }));
+      const p = mk('path', { d: bar(x, b.fcf, bw), fill: b.est ? 'var(--est)' : 'var(--accent)', stroke: b.est ? 'var(--accent)' : 'none', 'stroke-width': b.est ? 1.5 : 0, 'stroke-dasharray': b.est ? '3 2' : '' });
+      g.append(p);
+      const [l1, l2] = b.est ? ['est.', ''] : qshort(b.q).split(' ');
+      g.append(Object.assign(mk('text', { x: cx, y: H - 17, 'text-anchor': 'middle', class: 'lbl' }), { textContent: l1 || '' }));
+      if (l2) g.append(Object.assign(mk('text', { x: cx, y: H - 5, 'text-anchor': 'middle', class: 'lbl' }), { textContent: l2 }));
+      const showVal = b.est ? i === hist.length : i === hist.length - 1;
+      if (showVal) g.append(Object.assign(mk('text', { x: cx, y: b.fcf >= 0 ? Y(b.fcf) - 4 : Y(b.fcf) + 11, 'text-anchor': 'middle', class: 'val' }), { textContent: money(b.fcf, a.q_moneda) }));
+      const say = () => { ro.textContent = (b.est ? 'Faltante estimado por ' + (a.periodos_anio === 2 ? 'semestre' : 'trimestre') : b.q + (b.fin ? ' (cierre ' + fdate(b.fin) + ')' : '')) + ': ' + money(b.fcf, a.q_moneda); };
+      g.addEventListener('mouseenter', say); g.addEventListener('click', (e) => { e.stopPropagation(); say(); });
+      svg.append(g);
+    });
+    svg.append(mk('line', { x1: padL, x2: W - padR, y1: y0, y2: y0, stroke: 'var(--line)', 'stroke-width': 1 }));
+    return svg;
   }
 })();
 </script>

@@ -6,11 +6,17 @@ Datos crudos (JSON Lines, la última línea de cada ticker manda):
   raw/fin.jsonl       página /financials/ (+ cash-flow si falta FCF)  (semanal)
   raw/forecast.jsonl  página /forecast/ (diario, top 12)
   raw/tech.jsonl      página principal: rango de 52 semanas (diario, top 12)
+  raw/proj.jsonl      proyección (semanal y tras cada reporte, todas):
+                        stockanalysis /forecast/ (estimado del año fiscal: ventas, utilidad, EPS, FCF),
+                        stockanalysis /financials/cash-flow-statement/?p=quarterly (FCF de 8 trimestres),
+                        marketbeat /earnings/ (EPS estimado por trimestre y fecha del próximo reporte)
 Config: tickers.json (sector, origen y supuestos manuales opcionales).
 
 Uso:
   python3 build.py            -> escribe site/data.json
   python3 build.py --need     -> imprime los 12 tickers de mayor puntaje (para traer forecast y rango 52s)
+  python3 build.py --proj-due -> imprime los tickers cuya proyección falta, tiene más de 7 días
+                                 o ya pasó su fecha de reporte (hay que volver a traerla)
 """
 import json, sys, os, datetime
 
@@ -91,10 +97,95 @@ def evaluar(a):
     pot = 10 if potencial is not None and potencial >= 30 else 6 if potencial is not None and potencial >= 15 else 3 if potencial is not None and potencial >= 5 else 0
     puntaje = round(cumple / 11 * 50 + valor + caja + crec + pot)
     a.update(chk)
+    a.update(crec_ventas=pct_cambio(v0, v1), crec_utilidad=pct_cambio(u0, u1), crec_eps=pct_cambio(a["eps_fy0"], a["eps_fy1"]),
+             crec_fcf=pct_cambio(a["fcf_fy0"], a["fcf_fy1"]),
+             delta_margen=None if m0 is None or m1 is None else round(m0 - m1, 1))
     a.update(chk_div=(num(a["dividendo_fy0"]) or 0) > 0, margen_fy0=None if m0 is None else round(m0, 1),
              margen_fy1=None if m1 is None else round(m1, 1), cumple=cumple, potencial=potencial, puntaje=puntaje,
              veredicto="Candidata fuerte" if puntaje >= 75 else "Vigilar" if puntaje >= 60 else "No cumple")
     return a
+
+
+def pct_cambio(a, b):
+    a, b = num(a), num(b)
+    return round((a / b - 1) * 100, 1) if a is not None and b is not None and b > 0 else None
+
+
+def proyeccion(p):
+    """Proyección trimestral y de flujo de caja libre (FCF) a partir de raw/proj.jsonl."""
+    fq = [num(v) for v in (p.get("fcf_q") or [])]
+    ends = list(p.get("q_end") or [])
+    labels = list(p.get("q_labels") or [])
+    n = min(len(fq), len(ends), len(labels))
+    fq, ends, labels = fq[:n], ends[:n], labels[:n]
+    # ¿reporta trimestral o semestral?
+    gaps = []
+    for i in range(min(n, 5) - 1):
+        try:
+            d0 = datetime.date.fromisoformat(ends[i]); d1 = datetime.date.fromisoformat(ends[i + 1])
+            gaps.append((d0 - d1).days)
+        except (TypeError, ValueError):
+            pass
+    per_anio = 2 if gaps and sorted(gaps)[len(gaps) // 2] > 130 else 4
+    k = per_anio
+    ok = lambda xs: len(xs) == k and all(v is not None for v in xs)
+    ttm = sum(fq[:k]) if ok(fq[:k]) else None
+    ttm_prev = sum(fq[k:2 * k]) if ok(fq[k:2 * k]) else None
+    ult_aa = pct_cambio(fq[0], fq[k]) if n > k else None
+    est, prev = num(p.get("fcf_est")), num(p.get("fcf_prev"))
+    fpe = p.get("fy_prev_end")
+    ytd_i = [i for i in range(n) if fpe and ends[i] and ends[i] > fpe]
+    ytd = sum(fq[i] for i in ytd_i) if ytd_i and all(fq[i] is not None for i in ytd_i) else (0.0 if not ytd_i and n else None)
+    restantes = per_anio - len(ytd_i)
+    impl = round((est - ytd) / restantes, 1) if est is not None and ytd is not None and restantes > 0 else None
+    prom_reciente = sum(fq[:k]) / k if ttm is not None else None
+    exigencia = round(impl / prom_reciente, 2) if impl is not None and prom_reciente and prom_reciente > 0 else None
+    est_crec = pct_cambio(est, prev)
+    if est is not None and est <= 0:
+        tend = "Negativo"
+    else:
+        base = est_crec if est_crec is not None else pct_cambio(ttm, ttm_prev)
+        tend = None if base is None else "Creciendo" if base >= 10 else "Estable" if base >= -5 else "Cayendo"
+    eps_q = [q for q in (p.get("eps_trim") or []) if isinstance(q, dict) and num(q.get("eps")) is not None][:4]
+    q1 = eps_q[0] if eps_q else {}
+    q2 = eps_q[1] if len(eps_q) > 1 else {}
+    return {
+        "q_moneda": p.get("q_moneda") or "USD", "periodos_anio": per_anio,
+        "fcf_hist": [{"q": labels[i], "fin": ends[i], "fcf": fq[i]} for i in range(n)][::-1],  # antiguo -> reciente
+        "fcf_ttm": None if ttm is None else round(ttm, 1), "fcf_ttm_crec": pct_cambio(ttm, ttm_prev), "fcf_ult_aa": ult_aa,
+        "fy_est": p.get("fy_est"), "fy_prev": p.get("fy_prev"), "fcf_est": est, "fcf_prev": prev, "fcf_est_crec": est_crec,
+        "fcf_ytd": None if ytd is None else round(ytd, 1), "periodos_ytd": len(ytd_i), "periodos_restantes": max(restantes, 0),
+        "fcf_impl_trim": impl, "fcf_exigencia": exigencia, "fcf_tend": tend,
+        "ventas_est": num(p.get("rev_est")), "ventas_est_crec": pct_cambio(p.get("rev_est"), p.get("rev_prev")),
+        "util_est": num(p.get("ni_est")), "util_est_crec": pct_cambio(p.get("ni_est"), p.get("ni_prev")),
+        "eps_est_fy": num(p.get("eps_est")), "eps_est_fy_crec": pct_cambio(p.get("eps_est"), p.get("eps_prev")),
+        "analistas_fy": p.get("analysts"),
+        "prox_reporte": p.get("prox_reporte"), "reporte_confirmado": p.get("reporte_confirmado"),
+        "eps_trim": eps_q, "eps_q1": num(q1.get("eps")), "eps_q1_lbl": q1.get("q"), "eps_q1_n": q1.get("n"),
+        "eps_q2": num(q2.get("eps")), "eps_q2_lbl": q2.get("q"), "eps_q2_n": q2.get("n"),
+        "proj_fecha": p.get("proj_fecha"),
+    }
+
+
+def proj_due(cfg, pr):
+    hoy = datetime.date.today()
+    out = []
+    for t in cfg:
+        p = pr.get(t)
+        if not p or not p.get("fcf_q") or not p.get("fy_est"):
+            out.append(t); continue
+        try:
+            f = datetime.date.fromisoformat(p.get("proj_fecha"))
+        except (TypeError, ValueError):
+            out.append(t); continue
+        rep = None
+        try:
+            rep = datetime.date.fromisoformat(p.get("prox_reporte"))
+        except (TypeError, ValueError):
+            pass
+        if (hoy - f).days >= 7 or (rep and f <= rep < hoy):
+            out.append(t)
+    return out
 
 
 def supuestos(a, cfg):
@@ -147,10 +238,14 @@ def plan(a, cfg, fc, tc):
 
 def main():
     cfg = {t["ticker"]: t for t in json.load(open(os.path.join(HERE, "tickers.json"), encoding="utf-8"))}
+    if "--proj-due" in sys.argv:
+        print(" ".join(proj_due(cfg, latest("raw/proj.jsonl"))))
+        return
     if "--need" not in sys.argv:
-        for f in ("raw/stats.jsonl", "raw/fin.jsonl", "raw/forecast.jsonl", "raw/tech.jsonl"):
+        for f in ("raw/stats.jsonl", "raw/fin.jsonl", "raw/forecast.jsonl", "raw/tech.jsonl", "raw/proj.jsonl"):
             compact(f)
     st, fi, fcs, tcs = latest("raw/stats.jsonl"), latest("raw/fin.jsonl"), latest("raw/forecast.jsonl"), latest("raw/tech.jsonl")
+    pr = latest("raw/proj.jsonl")
     rows = []
     for t, c in cfg.items():
         s, f = st.get(t), fi.get(t, {})
@@ -175,6 +270,8 @@ def main():
             "eps_fy0": pick(eps, 1), "eps_fy1": pick(eps, 2), "fcf_fy0": pick(fcf, 1), "fcf_fy1": pick(fcf, 2),
             "dividendo_fy0": pick(div, 1), "fuente": f"https://stockanalysis.com/stocks/{t.lower()}/statistics/",
         }))
+    for r in rows:
+        r.update(proyeccion(pr.get(r["ticker"], {})))
     rows.sort(key=lambda r: -r["puntaje"])
     if "--need" in sys.argv:
         print(" ".join(r["ticker"] for r in rows[:12]))
@@ -207,7 +304,8 @@ def main():
     }
     os.makedirs(os.path.join(HERE, "site"), exist_ok=True)
     json.dump(out, open(os.path.join(HERE, "site", "data.json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
-    print(f"OK: {len(rows)} acciones, {len(planes)} planes. Sin datos de plan: {faltan or 'ninguna'}")
+    sin_proj = [r["ticker"] for r in rows if not r["fcf_hist"]]
+    print(f"OK: {len(rows)} acciones, {len(planes)} planes. Sin datos de plan: {faltan or 'ninguna'}. Sin proyección: {sin_proj or 'ninguna'}")
 
 
 if __name__ == "__main__":
