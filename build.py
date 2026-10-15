@@ -172,7 +172,7 @@ def proj_due(cfg, pr):
     out = []
     for t in cfg:
         p = pr.get(t)
-        if not p or not p.get("fcf_q") or not p.get("fy_est"):
+        if not p or not p.get("fy_est"):  # bancos (SYF) no publican FCF trimestral: no se reintenta a diario
             out.append(t); continue
         try:
             f = datetime.date.fromisoformat(p.get("proj_fecha"))
