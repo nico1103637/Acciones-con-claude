@@ -129,6 +129,58 @@ tr.det td:first-child{position:static}
 .eq th{cursor:default}
 .tag{font-size:.68rem;font-weight:600;padding:1px 7px;border-radius:999px;white-space:nowrap}
 .t-ok{background:var(--ok-bg);color:var(--ok)}.t-warn{background:var(--warn-bg);color:var(--warn)}.t-bad{background:var(--bad-bg);color:var(--bad)}
+/* pestañas */
+.tabs{display:flex;gap:4px;margin-top:16px;border-bottom:1px solid var(--line)}
+.tabs button{border:0;border-radius:8px 8px 0 0;background:transparent;color:var(--muted);padding:9px 16px;font-weight:500;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+.pg[hidden]{display:none}
+/* cartera */
+.pos{color:var(--ok)}.neg{color:var(--bad)}
+.sum{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:16px 24px}
+@media (max-width:760px){.sum{grid-template-columns:minmax(0,1fr)}}
+.tot .lab{color:var(--muted);font-size:.75rem}
+.tot .val{font-family:var(--mono);font-size:2.1rem;font-weight:500;line-height:1.15;margin:2px 0}
+.tot .chg{font-family:var(--mono);font-size:.9rem}
+.mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.mini div span{display:block;color:var(--muted);font-size:.7rem}
+.mini div b{font-family:var(--mono);font-weight:500;font-size:.92rem}
+.alloc{display:flex;height:10px;border-radius:5px;overflow:hidden;margin:16px 0 6px;gap:2px}
+.alloc i{display:block;height:100%}
+.alloc-lg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.74rem;color:var(--muted)}
+.alloc-lg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:0}
+.anote{background:var(--panel2);border-radius:8px;padding:12px 14px;font-size:.88rem;margin:0}
+.anote .when{display:block;color:var(--muted);font-size:.72rem;font-family:var(--mono);margin-bottom:4px}
+.pcard{margin-top:14px}
+.phead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.phead .tk{font-family:var(--mono);font-size:1.25rem;font-weight:500}
+.phead .co{color:var(--muted);font-size:.85rem}
+.phead .px{margin-left:auto;font-family:var(--mono);text-align:right}
+.phead .px b{font-size:1.15rem;font-weight:500}
+.pgrid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:12px 24px;margin-top:10px}
+@media (max-width:760px){.pgrid{grid-template-columns:minmax(0,1fr)}}
+.reco{border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.reco b{display:block;font-size:.95rem}
+.reco p{margin:3px 0 0;font-size:.84rem;color:var(--fg)}
+.r-ok{background:var(--ok-bg)}.r-ok b{color:var(--ok)}.r-warn{background:var(--warn-bg)}.r-warn b{color:var(--warn)}.r-bad{background:var(--bad-bg)}.r-bad b{color:var(--bad)}
+.sig{list-style:none;padding:0;margin:4px 0 0;font-size:.82rem}
+.sig li{position:relative;padding:3px 0 3px 16px}
+.sig li::before{content:"";position:absolute;left:2px;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.sig li.ok::before{background:var(--ok)}.sig li.warn::before{background:var(--warn)}.sig li.bad::before{background:var(--bad)}
+.pgrid>div>h3:first-child{margin-top:4px}
+.pcard h3{font-size:.8rem;margin:12px 0 4px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.pc{width:100%;height:auto;display:block;touch-action:pan-y}
+.pc .lbl{font-size:10px;fill:var(--muted);font-family:var(--mono)}
+.pc .rl{font-size:9.5px;font-family:var(--mono)}
+.pc-lg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.72rem;color:var(--muted);margin:4px 0 2px}
+.pc-lg i{display:inline-block;width:14px;height:0;border-top:2px solid;margin-right:5px;vertical-align:3px}
+.rng{position:relative;height:30px;margin:4px 0 2px}
+.rng .ln{position:absolute;top:13px;left:0;right:0;height:4px;border-radius:2px;background:var(--track)}
+.rng .mk{position:absolute;top:6px;width:2px;height:18px;margin-left:-1px;border-radius:1px}
+.rng-lb{position:relative;height:28px;font-size:.66rem;font-family:var(--mono);color:var(--muted)}
+.rng-lb span{position:absolute;transform:translateX(-50%);white-space:nowrap;text-align:center;line-height:1.2}
+.older summary{cursor:pointer;color:var(--accent);font-size:.8rem;margin-top:8px}
+.older p{font-size:.82rem;margin:6px 0}
+.older .when{color:var(--muted);font-family:var(--mono);font-size:.7rem;margin-right:6px}
 </style>
 </head>
 <body>
@@ -136,9 +188,20 @@ tr.det td:first-child{position:static}
   <header>
     <h1>Screener de acciones</h1>
     <div class="sub" id="stamp">Cargando datos…</div>
-    <p class="take" id="take"></p>
+    <nav class="tabs" role="tablist">
+      <button type="button" role="tab" data-pg="cartera" aria-selected="true">Mi cartera</button>
+      <button type="button" role="tab" data-pg="screener" aria-selected="false">Screener</button>
+    </nav>
   </header>
 
+  <div class="pg" id="pg-cartera">
+    <section class="card sum" id="c-sum"></section>
+    <div id="c-pos"></div>
+    <p class="note" style="margin-top:14px">Precios de cierre de stockanalysis.com; pueden diferir unos centavos de tu broker. La recomendación sale de reglas fijas (tendencia, valor justo de tu método, nivel de revisión = el mayor entre tu costo −15% y el mínimo de 52 semanas −3%) más la lectura diaria del analista. Para cambiar posiciones edita <code>cartera.json</code> o pídemelo. Herramienta de análisis, no asesoría financiera.</p>
+  </div>
+
+  <div class="pg" id="pg-screener" hidden>
+  <p class="take" id="take"></p>
   <div class="kpis">
     <div class="card kpi"><div class="lab">Acciones analizadas</div><div class="big" id="k-an">—</div></div>
     <div class="card kpi"><div class="lab">Cumplen tus 11 filtros</div><div class="big" id="k-11">—</div></div>
@@ -197,6 +260,7 @@ tr.det td:first-child{position:static}
     <p><b>Actualización:</b> cada día hábil antes de la apertura, con datos de stockanalysis.com (precio, valoración, estimados y precios objetivo). Los estados financieros se refrescan los lunes; la proyección, cada semana y después de cada reporte trimestral. Finviz y Koyfin no permiten lectura automática; úsalos para validar: <a href="https://finviz.com/screener.ashx?v=111&amp;f=cap_largeover,fa_curratio_o1.5,fa_epsyoy_pos,fa_netmargin_pos,fa_pe_u20,fa_peg_u2,fa_roi_o15,fa_salesqoq_pos&amp;o=-marketcap" target="_blank" rel="noopener">screener de Finviz con tus filtros</a> · <a href="https://app.koyfin.com/home" target="_blank" rel="noopener">Koyfin</a>.</p>
     <p class="muted">Herramienta de análisis, no asesoría financiera. Empresas extranjeras (TME, PDD, NVO) reportan en moneda local.</p>
   </section>
+  </div>
   <div class="foot" id="foot"></div>
 </div>
 
@@ -222,6 +286,7 @@ tr.det td:first-child{position:static}
     const comprar = D.plan.filter((p) => p.accion === 'Comprar escalonado').map((p) => p.ticker);
     const esperar = D.plan.filter((p) => p.accion !== 'Comprar escalonado').map((p) => p.ticker);
     $('#take').textContent = `${R.cumplen_todo} de ${R.analizadas} cumplen tus 11 filtros. En zona de compra hoy: ${comprar.join(', ') || 'ninguna'}.` + (esperar.length ? ` Esperar retroceso: ${esperar.join(', ')}.` : '');
+    drawCartera(); setupTabs();
     drawMap(); setupTable(); drawTable();
     $('#foot').textContent = 'Fuente: stockanalysis.com. ' + (D.sin_plan && D.sin_plan.length ? 'Sin datos para plan: ' + D.sin_plan.join(', ') + '.' : '');
   }
@@ -485,6 +550,191 @@ tr.det td:first-child{position:static}
       svg.append(g);
     });
     svg.append(mk('line', { x1: padL, x2: W - padR, y1: y0, y2: y0, stroke: 'var(--line)', 'stroke-width': 1 }));
+    return svg;
+  }
+
+  // ---------- pestañas ----------
+  function setupTabs() {
+    const btns = document.querySelectorAll('.tabs button');
+    const show = (pg) => {
+      btns.forEach((b) => b.setAttribute('aria-selected', b.dataset.pg === pg ? 'true' : 'false'));
+      document.querySelectorAll('.pg').forEach((p) => (p.hidden = p.id !== 'pg-' + pg));
+      try { localStorage.setItem('screener_pg', pg); } catch (e) {}
+      dispatchEvent(new Event('resize'));
+    };
+    btns.forEach((b) => b.addEventListener('click', () => show(b.dataset.pg)));
+    let pg = D.cartera ? 'cartera' : 'screener';
+    try { const s = localStorage.getItem('screener_pg'); if (s === 'screener' || (s === 'cartera' && D.cartera)) pg = s; } catch (e) {}
+    if (location.hash === '#screener' || location.hash === '#cartera') pg = location.hash.slice(1);
+    show(pg);
+  }
+
+  // ---------- mi cartera ----------
+  const PAL = ['#4c8df6', '#a371f7', '#2fb39a', '#e3a33b', '#e5534b'];
+  const cls = (v) => (n(v) === null ? 'muted' : v >= 0 ? 'pos' : 'neg');
+  const sm = (v, d = 2) => (n(v) === null ? NA : (v >= 0 ? '+' : '−') + '$' + fx(Math.abs(v), d));
+  const day = (s) => fdate(s);
+
+  function drawCartera() {
+    const C = D.cartera; if (!C) return;
+    const sum = $('#c-sum'); sum.replaceChildren();
+    const left = el('div', 'tot');
+    left.append(el('div', 'lab', 'Valor de tu cartera · cierre del ' + day(C.fecha)), el('div', 'val', '$' + fx(C.valor_total, 2)));
+    const chg = el('div', 'chg ' + cls(C.cambio_dia), sm(C.cambio_dia) + ' (' + sgn(C.cambio_dia_pct, 2) + ') hoy'); left.append(chg);
+    const mini = el('div', 'mini');
+    [['Ganancia total', sm(C.ganancia) + ' · ' + sgn(C.ganancia_pct), cls(C.ganancia)], ['Invertido', '$' + fx(C.invertido, 2), ''], ['Efectivo', '$' + fx(C.efectivo, 2), '']]
+      .forEach(([a, b, c]) => { const d = el('div'); d.append(el('span', null, a), el('b', c, b)); mini.append(d); });
+    left.append(mini);
+    const al = el('div', 'alloc'), lg = el('div', 'alloc-lg');
+    C.posiciones.forEach((o, i) => {
+      const s = el('i'); s.style.width = o.peso + '%'; s.style.background = PAL[i % PAL.length]; s.title = o.ticker + ' ' + fx(o.peso, 1) + '%'; al.append(s);
+      const t = el('span'); const k = el('i'); k.style.background = PAL[i % PAL.length]; t.append(k, document.createTextNode(o.ticker + ' ' + fx(o.peso, 0) + '%')); lg.append(t);
+    });
+    const ce = el('i'); ce.style.width = (C.efectivo / C.valor_total * 100) + '%'; ce.style.background = 'var(--track)'; al.append(ce);
+    const te = el('span'); const ke = el('i'); ke.style.background = 'var(--track)'; te.append(ke, document.createTextNode('Efectivo ' + fx(C.efectivo / C.valor_total * 100, 0) + '%')); lg.append(te);
+    left.append(al, lg);
+    const right = el('div');
+    if (C.historico && C.historico.length > 2) {
+      right.append(el('h3', null, 'Valor de tus posiciones actuales'));
+      const ro = el('div', 'readout', '');
+      right.append(lineChart({ serie: C.historico, refs: [{ v: C.invertido + C.efectivo, label: 'Invertido', color: 'var(--fg)', dash: '4 3' }], ro, aria: 'Valor histórico de la cartera', fmt: (v) => '$' + fx(v, 0), base: C.invertido + C.efectivo }), ro);
+      right.firstChild.style.cssText = 'font-size:.8rem;margin:0 0 4px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em';
+    }
+    sum.append(left, right);
+    if (C.notas && C.notas.length) {
+      const nb = el('div'); nb.style.gridColumn = '1/-1';
+      const p = el('p', 'anote'); p.append(el('span', 'when', 'Lectura del día · ' + day(C.notas[0].fecha)), document.createTextNode(C.notas[0].texto));
+      nb.append(p); nb.append(older(C.notas)); sum.append(nb);
+    }
+    const box = $('#c-pos'); box.replaceChildren();
+    C.posiciones.forEach((o, i) => box.append(posCard(o, i)));
+  }
+
+  function older(notas) {
+    if (notas.length < 2) return document.createDocumentFragment();
+    const d = el('details', 'older');
+    d.append(el('summary', null, 'Notas anteriores (' + (notas.length - 1) + ')'));
+    notas.slice(1).forEach((x) => { const p = el('p'); p.append(el('span', 'when', day(x.fecha)), document.createTextNode(x.texto)); d.append(p); });
+    return d;
+  }
+
+  function posCard(o, i) {
+    const card = el('section', 'card pcard');
+    const h = el('div', 'phead');
+    const tk = el('span', 'tk', o.ticker); tk.style.color = PAL[i % PAL.length];
+    h.append(tk, el('span', 'co', (o.empresa || '') + (o.sector ? ' · ' + o.sector : '')));
+    const px = el('div', 'px'); px.append(el('b', null, usd(o.precio)), el('div', cls(o.cambio_dia), sgn(o.cambio_dia, 2) + ' hoy'));
+    h.append(px); card.append(h);
+    const kv = el('div', 'kv');
+    [['Acciones', fx(o.acciones, 4)], ['Tu costo', usd(o.costo)], ['Valor', '$' + fx(o.valor, 2)], ['Ganancia', [sm(o.ganancia) + ' · ' + sgn(o.ganancia_pct), cls(o.ganancia)]],
+     ['Hoy', [sm(o.ganancia_dia), cls(o.ganancia_dia)]], ['5 días', [sgn(o.cambio_5d), cls(o.cambio_5d)]], ['1 mes', [sgn(o.cambio_1m), cls(o.cambio_1m)]], ['Peso', fx(o.peso, 1) + '%']]
+      .forEach(([a, b]) => { const c = el('div'); const [t, k] = Array.isArray(b) ? b : [b, '']; c.append(el('span', null, a), el('b', k, t)); kv.append(c); });
+    card.append(kv);
+    const rc = el('div', 'reco r-' + o.accion_cls); rc.append(el('b', null, 'Recomendación: ' + o.accion), el('p', null, o.accion_razon)); rc.style.margin = '12px 0 0'; card.append(rc);
+    const g = el('div', 'pgrid'), L = el('div'), R = el('div');
+    // gráfico de precio
+    L.append(el('h3', null, 'Precio · últimos ' + o.serie.length + ' días hábiles'));
+    const refs = [
+      { v: o.costo, label: 'Tu costo', color: 'var(--fg)', dash: '5 3' },
+      { v: o.nivel_revision, label: 'Revisión', color: 'var(--bad)', dash: '2 3' },
+      { v: o.ma50, label: 'Media 50d', color: 'var(--warn)', dash: '1 3' },
+      { v: o.ma200, label: 'Media 200d', color: 'var(--muted)', dash: '6 4' },
+    ];
+    const ro = el('div', 'readout', 'Toca el gráfico para ver cada día');
+    const lgd = el('div', 'pc-lg');
+    const chart = lineChart({ serie: o.serie, refs, ro, aria: 'Precio de ' + o.ticker, fmt: (v) => '$' + fx(v, 2), color: PAL[i % PAL.length], costo: o.costo, legend: lgd });
+    L.append(lgd, chart, ro);
+    // lectura del analista
+    if (o.notas && o.notas.length) {
+      L.append(el('h3', null, 'Lectura del analista · ' + day(o.notas[0].fecha)));
+      L.append(el('p', 'anote', o.notas[0].texto)); L.append(older(o.notas));
+    }
+    // recomendación y señales
+    R.append(el('h3', null, 'Señales de hoy'));
+    const ul = el('ul', 'sig'); o.senales.forEach((s) => ul.append(el('li', s.tipo, s.texto))); R.append(ul);
+    R.append(el('h3', null, 'Niveles clave'));
+    const lv = el('div', 'kv'); lv.style.gridTemplateColumns = 'repeat(2,minmax(0,1fr))';
+    const vs = (v) => (n(v) === null ? '' : ' (' + sgn((v / o.precio - 1) * 100, 0) + ')');
+    [['Valor justo (tu método)', usd(o.valor_justo) + vs(o.valor_justo)], ['Objetivo analistas', usd(o.precio_objetivo) + vs(o.precio_objetivo)],
+     ['Rango analistas', (n(o.pt_bajo) === null ? NA : usd(o.pt_bajo) + ' – ' + usd(o.pt_alto))], ['Precio máx. de entrada', usd(o.entrada_max)],
+     ['Nivel de revisión', usd(o.nivel_revision) + vs(o.nivel_revision)], ['Rango 52 semanas', n(o.min_52s) === null ? NA : usd(o.min_52s) + ' – ' + usd(o.max_52s)]]
+      .forEach(([a, b]) => { const c = el('div'); c.append(el('span', null, a), el('b', null, b)); lv.append(c); });
+    R.append(lv);
+    R.append(el('h3', null, 'Proyección ' + (o.fy_est || '')));
+    const pj = el('ul', 'sig');
+    const it = (t, v) => { if (v !== null && v !== undefined) pj.append(el('li', t, v)); };
+    it(clsT(o.ventas_est_crec), n(o.ventas_est_crec) === null ? null : 'Ventas estimadas ' + sgn(o.ventas_est_crec) + ' vs el año anterior.');
+    it(clsT(o.eps_est_fy_crec), n(o.eps_est_fy_crec) === null ? null : 'EPS estimado ' + fx(o.eps_est_fy, 2) + ' (' + sgn(o.eps_est_fy_crec) + ').');
+    it(o.fcf_tend === 'Creciendo' ? 'ok' : o.fcf_tend === 'Estable' ? 'warn' : 'bad', o.fcf_tend ? 'Flujo de caja libre: ' + o.fcf_tend.toLowerCase() + (n(o.fcf_est_crec) !== null ? ' (' + sgn(o.fcf_est_crec) + ')' : '') + '.' : null);
+    it('', n(o.pe_fwd) === null ? null : 'P/E futuro ' + fx(o.pe_fwd, 1) + ' · analistas: ' + (o.recomendacion_analistas || NA) + '.');
+    it('warn', o.prox_reporte ? 'Próximo reporte: ' + day(o.prox_reporte) + (o.reporte_confirmado ? ' (confirmado).' : ' (fecha estimada).') : null);
+    R.append(pj);
+    const lk = el('p', 'muted'); lk.style.fontSize = '.78rem'; lk.textContent = 'Detalle trimestre a trimestre del flujo de caja en la pestaña Screener → Proyección.'; R.append(lk);
+    g.append(L, R); card.append(g);
+    return card;
+  }
+  function clsT(v) { return n(v) === null ? '' : v >= 0 ? 'ok' : 'bad'; }
+
+  function lineChart({ serie, refs = [], ro, aria, fmt, color = 'var(--accent)', costo = null, base = null, legend = null }) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const mk = (t, at) => { const e = document.createElementNS(NS, t); for (const k in at) e.setAttribute(k, at[k]); return e; };
+    const narrow = innerWidth < 640;
+    const W = narrow ? 380 : 600, H = narrow ? 200 : 230, pL = 4, pR = narrow ? 56 : 62, pT = 12, pB = 24;
+    const vs = serie.map((p) => p[1]);
+    let lo = Math.min(...vs), hi = Math.max(...vs);
+    const span0 = hi - lo || hi * 0.05;
+    const inR = refs.filter((r) => n(r.v) !== null && r.v >= lo - span0 * 0.6 && r.v <= hi + span0 * 0.6);
+    const out = refs.filter((r) => n(r.v) !== null && !inR.includes(r));
+    inR.forEach((r) => { lo = Math.min(lo, r.v); hi = Math.max(hi, r.v); });
+    const pad = (hi - lo) * 0.06 || 1; lo -= pad; hi += pad;
+    const X = (i) => pL + (i / Math.max(1, serie.length - 1)) * (W - pL - pR);
+    const Y = (v) => pT + (hi - v) / (hi - lo) * (H - pT - pB);
+    const svg = mk('svg', { viewBox: `0 0 ${W} ${H}`, class: 'pc', role: 'img', 'aria-label': aria });
+    // rejilla suave
+    for (let k = 0; k <= 3; k++) { const y = pT + k * (H - pT - pB) / 3; svg.append(mk('line', { x1: pL, x2: W - pR, y1: y, y2: y, stroke: 'var(--line)', 'stroke-width': 0.6, opacity: 0.6 })); }
+    // área y línea
+    const pts = serie.map((p, i) => `${X(i).toFixed(1)},${Y(p[1]).toFixed(1)}`);
+    svg.append(mk('path', { d: `M${X(0)},${H - pB}L${pts.join('L')}L${X(serie.length - 1)},${H - pB}Z`, fill: color, opacity: 0.09 }));
+    // referencias
+    const labs = [];
+    inR.forEach((r) => {
+      svg.append(mk('line', { x1: pL, x2: W - pR, y1: Y(r.v), y2: Y(r.v), stroke: r.color, 'stroke-width': 1.3, 'stroke-dasharray': r.dash, opacity: 0.9 }));
+      labs.push({ y: Y(r.v), t: fmt(r.v), c: r.color });
+    });
+    svg.append(mk('path', { d: 'M' + pts.join('L'), fill: 'none', stroke: color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+    const last = serie[serie.length - 1];
+    svg.append(mk('circle', { cx: X(serie.length - 1), cy: Y(last[1]), r: 3.5, fill: color }));
+    labs.push({ y: Y(last[1]), t: fmt(last[1]), c: color, b: true });
+    // etiquetas a la derecha sin superponerse
+    labs.sort((a, b) => a.y - b.y);
+    for (let k = 1; k < labs.length; k++) if (labs[k].y - labs[k - 1].y < 12) labs[k].y = labs[k - 1].y + 12;
+    const over = labs.length ? labs[labs.length - 1].y - (H - pB + 4) : 0;
+    if (over > 0) labs.forEach((l) => (l.y -= over));
+    labs.forEach((l) => svg.append(Object.assign(mk('text', { x: W - pR + 6, y: l.y + 3.5, class: 'rl', fill: l.c, 'font-weight': l.b ? 600 : 400 }), { textContent: l.t })));
+    // fechas
+    [0, Math.floor((serie.length - 1) / 2), serie.length - 1].forEach((i, k) => svg.append(Object.assign(mk('text', { x: X(i), y: H - 6, class: 'lbl', 'text-anchor': k === 0 ? 'start' : k === 2 ? 'end' : 'middle' }), { textContent: day(serie[i][0]) })));
+    // leyenda
+    if (legend) {
+      const li = (txt, c, dash) => { const s = el('span'); const k = el('i'); k.style.borderColor = c; if (dash) k.style.borderTopStyle = 'dashed'; s.append(k, document.createTextNode(txt)); legend.append(s); };
+      li('Precio', color, false);
+      inR.forEach((r) => li(r.label, r.color, true));
+      out.forEach((r) => { const s = el('span', null, r.label + ' ' + fmt(r.v) + ' (fuera del gráfico)'); legend.append(s); });
+    }
+    // lectura al tocar
+    const vl = mk('line', { y1: pT, y2: H - pB, stroke: 'var(--muted)', 'stroke-width': 1, opacity: 0 });
+    const dot = mk('circle', { r: 4, fill: color, stroke: 'var(--panel)', 'stroke-width': 2, opacity: 0 });
+    svg.append(vl, dot);
+    const ref0 = costo ?? base;
+    const at = (ev) => {
+      const r = svg.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width * W;
+      const i = Math.max(0, Math.min(serie.length - 1, Math.round((x - pL) / (W - pL - pR) * (serie.length - 1))));
+      const p = serie[i];
+      vl.setAttribute('x1', X(i)); vl.setAttribute('x2', X(i)); vl.setAttribute('opacity', 0.6);
+      dot.setAttribute('cx', X(i)); dot.setAttribute('cy', Y(p[1])); dot.setAttribute('opacity', 1);
+      if (ro) ro.textContent = day(p[0]) + ': ' + fmt(p[1]) + (ref0 ? ' · ' + sgn((p[1] / ref0 - 1) * 100) + (costo ? ' vs tu costo' : ' vs lo invertido') : '');
+    };
+    svg.addEventListener('pointermove', at); svg.addEventListener('pointerdown', at);
+    svg.addEventListener('pointerleave', () => { vl.setAttribute('opacity', 0); dot.setAttribute('opacity', 0); });
     return svg;
   }
 })();

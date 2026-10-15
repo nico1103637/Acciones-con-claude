@@ -1,0 +1,23 @@
+{
+  "moneda": "USD",
+  "efectivo": 50.11,
+  "actualizado": "2026-10-15",
+  "nota": "Posiciones reales de Nicolas (captura del broker, 15 oct 2026). Editar aquí si compra o vende: acciones y costo promedio.",
+  "posiciones": [
+    {
+      "ticker": "NVDA",
+      "acciones": 13.2471,
+      "costo": 199.54
+    },
+    {
+      "ticker": "APP",
+      "acciones": 6.158,
+      "costo": 276.3
+    },
+    {
+      "ticker": "NBIX",
+      "acciones": 11.2065,
+      "costo": 137.26
+    }
+  ]
+}
