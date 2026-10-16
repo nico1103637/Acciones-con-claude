@@ -341,6 +341,8 @@ def senales_y_accion(x):
         acc, cls, why = "Mantener · no promediar aún", "warn", (
             f"Los fundamentales siguen sólidos, pero el precio va en tendencia bajista. Sumar solo si recupera la media de 50 días (${ma50:.2f})"
             + (f" o si baja hacia el soporte de ${x['entrada_2']:.2f}." if x.get("entrada_2") else "."))
+    elif emax and precio <= emax and x["puntaje"] >= 75 and x["peso"] >= 40:
+        acc, cls, why = "Mantener", "ok", f"Precio y fundamentales favorables, pero ya pesa {x['peso']:.0f}% de tu cartera: mejor no sumar más aquí."
     elif emax and precio <= emax and x["puntaje"] >= 75:
         acc, cls, why = "Mantener · acumular en caídas", "ok", f"Sigue por debajo de su precio máximo de entrada (${emax:.2f}) con fundamentales fuertes."
     else:
