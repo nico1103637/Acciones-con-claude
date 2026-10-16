@@ -330,7 +330,15 @@ def senales_y_accion(x):
     if x["peso"] >= 45:
         add("warn", f"Pesa {x['peso']:.0f}% de tu cartera: concentración alta en una sola empresa.")
 
-    vj, emax, rev = x.get("valor_justo"), x.get("entrada_max"), x["nivel_revision"]
+    vj, emax, rev = x.get("valor_justo"), x.get("entrada_max"), x.get("nivel_revision")
+    if rev is None:  # en seguimiento, sin posición
+        if x["puntaje"] is not None and x["puntaje"] < 75:
+            return s, "No comprar por ahora", "warn", (f"Puntaje {x['puntaje']} con tu método (fuerte desde 75)"
+                + (f"; el P/E de {x['pe']:.0f} está muy por encima de tu tope de 20." if x.get("pe") and x["pe"] > 20 else ".")
+                + (f" Tu precio máximo de entrada sería ${emax:.2f}." if emax else ""))
+        if emax and precio <= emax:
+            return s, "Zona de compra", "ok", f"Cumple tu método y cotiza bajo su precio máximo de entrada (${emax:.2f}); entrar escalonado."
+        return s, "Esperar", "warn", (f"Buena empresa para tu método, pero cara hoy: espera a ${emax:.2f} o menos." if emax else "Sin precio de entrada calculado.")
     if precio <= rev:
         acc, cls, why = "Revisar tesis", "bad", f"Perforó tu nivel de revisión (${rev:.2f}). Revisa si cambió algo en el negocio antes de decidir si reduces."
     elif vj and precio >= vj * 0.97:
@@ -357,50 +365,58 @@ def cartera(rows, cfg, fcs, tcs, st):
     c = json.load(open(p, encoding="utf-8"))
     pos = c.get("posiciones") or []
     tks = [x["ticker"].upper() for x in pos]
-    h = historial(tks, st)
+    vig = [t.upper() for t in (c.get("seguimiento") or []) if t.upper() not in tks]
+    h = historial(tks + vig, st)
     nt = notas()
     by = {r["ticker"]: r for r in rows}
     efectivo = num(c.get("efectivo")) or 0
-    out, total, invertido, ayer = [], 0.0, 0.0, 0.0
-    for x in pos:
-        t = x["ticker"].upper()
+
+    def ficha(t, acc_n=None, costo=None):
         a = by.get(t, {})
         serie = sorted(h.get(t, {}).items())
         precio = serie[-1][1] if serie else num(a.get("precio"))
-        fecha = serie[-1][0] if serie else a.get("fecha_precio")
-        acc_n, costo = num(x["acciones"]), num(x["costo"])
-        valor, base = acc_n * precio, acc_n * costo
         prev = serie[-2][1] if len(serie) > 1 else precio
-        total += valor; invertido += base; ayer += acc_n * prev
         pl = plan(dict(a, precio=precio), cfg.get(t, {}), fcs.get(t, {}), tcs.get(t, {})) if a else None
         tc = tcs.get(t, {})
         min52 = num(tc.get("min_52s"))
-        rev = max(costo * 0.85, min52 * 0.97 if min52 else 0)  # nivel para revisar la tesis
-        out.append({
-            "ticker": t, "empresa": a.get("empresa"), "sector": a.get("sector"), "acciones": acc_n, "costo": costo,
-            "precio": precio, "fecha": fecha, "valor": round(valor, 2), "invertido": round(base, 2),
-            "ganancia": round(valor - base, 2), "ganancia_pct": pct_cambio(precio, costo),
-            "cambio_dia": pct_cambio(precio, prev), "ganancia_dia": round(acc_n * (precio - prev), 2),
-            "cambio_5d": cambio_n(serie, 5), "cambio_1m": cambio_n(serie, 21),
-            "max_periodo": max(v for _, v in serie) if serie else None,
-            "serie": [[d, v] for d, v in serie[-130:]],
+        o = {
+            "ticker": t, "empresa": a.get("empresa"), "sector": a.get("sector"),
+            "precio": precio, "fecha": serie[-1][0] if serie else a.get("fecha_precio"), "previo": prev,
+            "cambio_dia": pct_cambio(precio, prev), "cambio_5d": cambio_n(serie, 5), "cambio_1m": cambio_n(serie, 21),
+            "max_periodo": max(v for _, v in serie) if serie else None, "serie": [[d, v] for d, v in serie[-130:]],
             "ma50": a.get("ma50"), "ma200": a.get("ma200"), "rsi": a.get("rsi"), "beta": a.get("beta"),
             "min_52s": min52, "max_52s": num(tc.get("max_52s")),
             "precio_objetivo": a.get("precio_objetivo"), "potencial": pct_cambio(a.get("precio_objetivo"), precio),
             "pt_bajo": (pl or {}).get("pt_bajo"), "pt_alto": (pl or {}).get("pt_alto"),
             "valor_justo": (pl or {}).get("valor_justo"), "entrada_max": (pl or {}).get("entrada_max"),
-            "entrada_2": (pl or {}).get("entrada_2"), "nivel_revision": round(rev, 2),
-            "puntaje": a.get("puntaje"), "cumple": a.get("cumple"), "veredicto": a.get("veredicto"),
+            "entrada_1": (pl or {}).get("entrada_1"), "entrada_2": (pl or {}).get("entrada_2"), "stop": (pl or {}).get("stop"),
+            "puntaje": a.get("puntaje"), "cumple": a.get("cumple"), "veredicto": a.get("veredicto"), "pe": a.get("pe"),
             "fcf_tend": a.get("fcf_tend"), "fcf_est_crec": a.get("fcf_est_crec"), "fy_est": a.get("fy_est"),
             "ventas_est_crec": a.get("ventas_est_crec"), "eps_est_fy_crec": a.get("eps_est_fy_crec"),
             "eps_est_fy": a.get("eps_est_fy"), "pe_fwd": a.get("pe_fwd"), "prox_reporte": a.get("prox_reporte"),
             "reporte_confirmado": a.get("reporte_confirmado"), "recomendacion_analistas": a.get("recomendacion"),
             "notas": nt.get(t, []),
-        })
+        }
+        if acc_n is not None:
+            o.update(acciones=acc_n, costo=costo, valor=round(acc_n * precio, 2), invertido=round(acc_n * costo, 2),
+                     ganancia=round(acc_n * (precio - costo), 2), ganancia_pct=pct_cambio(precio, costo),
+                     ganancia_dia=round(acc_n * (precio - prev), 2),
+                     nivel_revision=round(max(costo * 0.85, min52 * 0.97 if min52 else 0), 2))  # nivel para revisar la tesis
+        return o
+
+    out = [ficha(x["ticker"].upper(), num(x["acciones"]), num(x["costo"])) for x in pos]
+    total = sum(o["valor"] for o in out); invertido = sum(o["invertido"] for o in out)
+    ayer = sum(o["acciones"] * o["previo"] for o in out)
     total_c = total + efectivo
     for o in out:
         o["peso"] = round(o["valor"] / total_c * 100, 1)
         o["senales"], o["accion"], o["accion_cls"], o["accion_razon"] = senales_y_accion(o)
+    seg = []
+    for t in vig:
+        o = ficha(t)
+        o["peso"] = 0
+        o["senales"], o["accion"], o["accion_cls"], o["accion_razon"] = senales_y_accion(o)
+        seg.append(o)
     # valor histórico de las posiciones actuales (mismas cantidades, precios de cada día)
     fechas = sorted(set.intersection(*[set(h.get(t, {})) for t in tks])) if tks else []
     hist_val = [[d, round(sum(num(x["acciones"]) * h[x["ticker"].upper()][d] for x in pos) + efectivo, 2)] for d in fechas][-130:]
@@ -408,8 +424,8 @@ def cartera(rows, cfg, fcs, tcs, st):
         "moneda": c.get("moneda", "USD"), "efectivo": efectivo, "valor_total": round(total_c, 2),
         "invertido": round(invertido, 2), "ganancia": round(total - invertido, 2), "ganancia_pct": pct_cambio(total, invertido),
         "cambio_dia": round(total - ayer, 2), "cambio_dia_pct": pct_cambio(total, ayer),
-        "fecha": max((o["fecha"] for o in out if o["fecha"]), default=None), "posiciones": out, "historico": hist_val,
-        "notas": nt.get("CARTERA", []),
+        "fecha": max((o["fecha"] for o in out if o["fecha"]), default=None), "posiciones": out, "seguimiento": seg,
+        "historico": hist_val, "notas": nt.get("CARTERA", []),
     }
 
 

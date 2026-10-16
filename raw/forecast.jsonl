@@ -8,4 +8,5 @@
 {"ticker": "NBIX", "eps_prox": 11.96, "fy_prox": "FY 2027", "pt_bajo": 150, "pt_mediana": 213, "pt_alto": 253}
 {"ticker": "NVDA", "eps_prox": 15.91, "fy_prox": "FY 2028", "pt_bajo": 180, "pt_mediana": 315, "pt_alto": 515}
 {"ticker": "PAAS", "eps_prox": 4.75, "fy_prox": "FY 2027", "pt_bajo": 51, "pt_mediana": 57, "pt_alto": 94}
+{"ticker": "PLTR", "eps_prox": 2.35, "fy_prox": "FY 2027", "pt_bajo": 80, "pt_mediana": 217.5, "pt_alto": 265}
 {"ticker": "UBER", "eps_prox": 4.42, "fy_prox": "FY 2027", "pt_bajo": 70, "pt_mediana": 100.5, "pt_alto": 150}

@@ -2,7 +2,7 @@
   "moneda": "USD",
   "efectivo": 50.11,
   "actualizado": "2026-10-15",
-  "nota": "Posiciones reales de Nicolas (captura del broker, 15 oct 2026). Editar aquí si compra o vende: acciones y costo promedio.",
+  "nota": "Posiciones reales de Nicolas (captura del broker, 15 oct 2026). Editar aquí si compra o vende: acciones y costo promedio. 'seguimiento': acciones que Nicolas solo quiere vigilar, sin posición.",
   "posiciones": [
     {
       "ticker": "NVDA",
@@ -19,5 +19,8 @@
       "acciones": 11.2065,
       "costo": 137.26
     }
+  ],
+  "seguimiento": [
+    "PLTR"
   ]
 }

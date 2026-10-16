@@ -608,6 +608,11 @@ tr.det td:first-child{position:static}
     }
     const box = $('#c-pos'); box.replaceChildren();
     C.posiciones.forEach((o, i) => box.append(posCard(o, i)));
+    if (C.seguimiento && C.seguimiento.length) {
+      const hd = el('h2', null, 'En seguimiento'); hd.style.margin = '26px 0 2px';
+      box.append(hd, el('p', 'note', 'Acciones que vigilas sin tenerlas. Se evalúan con tu método para decirte si conviene entrar y a qué precio.'));
+      C.seguimiento.forEach((o, i) => box.append(posCard(o, C.posiciones.length + i)));
+    }
   }
 
   function older(notas) {
@@ -625,9 +630,11 @@ tr.det td:first-child{position:static}
     h.append(tk, el('span', 'co', (o.empresa || '') + (o.sector ? ' · ' + o.sector : '')));
     const px = el('div', 'px'); px.append(el('b', null, usd(o.precio)), el('div', cls(o.cambio_dia), sgn(o.cambio_dia, 2) + ' hoy'));
     h.append(px); card.append(h);
+    const watch = o.acciones === undefined;
     const kv = el('div', 'kv');
+    (watch ? [['Hoy', [sgn(o.cambio_dia, 2), cls(o.cambio_dia)]], ['5 días', [sgn(o.cambio_5d), cls(o.cambio_5d)]], ['1 mes', [sgn(o.cambio_1m), cls(o.cambio_1m)]], ['Puntaje', o.puntaje + ' · ' + o.cumple + '/11 filtros']] :
     [['Acciones', fx(o.acciones, 4)], ['Tu costo', usd(o.costo)], ['Valor', '$' + fx(o.valor, 2)], ['Ganancia', [sm(o.ganancia) + ' · ' + sgn(o.ganancia_pct), cls(o.ganancia)]],
-     ['Hoy', [sm(o.ganancia_dia), cls(o.ganancia_dia)]], ['5 días', [sgn(o.cambio_5d), cls(o.cambio_5d)]], ['1 mes', [sgn(o.cambio_1m), cls(o.cambio_1m)]], ['Peso', fx(o.peso, 1) + '%']]
+     ['Hoy', [sm(o.ganancia_dia), cls(o.ganancia_dia)]], ['5 días', [sgn(o.cambio_5d), cls(o.cambio_5d)]], ['1 mes', [sgn(o.cambio_1m), cls(o.cambio_1m)]], ['Peso', fx(o.peso, 1) + '%']])
       .forEach(([a, b]) => { const c = el('div'); const [t, k] = Array.isArray(b) ? b : [b, '']; c.append(el('span', null, a), el('b', k, t)); kv.append(c); });
     card.append(kv);
     const rc = el('div', 'reco r-' + o.accion_cls); rc.append(el('b', null, 'Recomendación: ' + o.accion), el('p', null, o.accion_razon)); rc.style.margin = '12px 0 0'; card.append(rc);
@@ -635,8 +642,8 @@ tr.det td:first-child{position:static}
     // gráfico de precio
     L.append(el('h3', null, 'Precio · últimos ' + o.serie.length + ' días hábiles'));
     const refs = [
-      { v: o.costo, label: 'Tu costo', color: 'var(--fg)', dash: '5 3' },
-      { v: o.nivel_revision, label: 'Revisión', color: 'var(--bad)', dash: '2 3' },
+      ...(watch ? [{ v: o.entrada_max, label: 'Precio máx. de entrada', color: 'var(--ok)', dash: '5 3' }] :
+        [{ v: o.costo, label: 'Tu costo', color: 'var(--fg)', dash: '5 3' }, { v: o.nivel_revision, label: 'Revisión', color: 'var(--bad)', dash: '2 3' }]),
       { v: o.ma50, label: 'Media 50d', color: 'var(--warn)', dash: '1 3' },
       { v: o.ma200, label: 'Media 200d', color: 'var(--muted)', dash: '6 4' },
     ];
@@ -657,7 +664,7 @@ tr.det td:first-child{position:static}
     const vs = (v) => (n(v) === null ? '' : ' (' + sgn((v / o.precio - 1) * 100, 0) + ')');
     [['Valor justo (tu método)', usd(o.valor_justo) + vs(o.valor_justo)], ['Objetivo analistas', usd(o.precio_objetivo) + vs(o.precio_objetivo)],
      ['Rango analistas', (n(o.pt_bajo) === null ? NA : usd(o.pt_bajo) + ' – ' + usd(o.pt_alto))], ['Precio máx. de entrada', usd(o.entrada_max)],
-     ['Nivel de revisión', usd(o.nivel_revision) + vs(o.nivel_revision)], ['Rango 52 semanas', n(o.min_52s) === null ? NA : usd(o.min_52s) + ' – ' + usd(o.max_52s)]]
+     watch ? ['Tu método (P/E ≤ 20)', 'P/E actual ' + fx(o.pe, 0)] : ['Nivel de revisión', usd(o.nivel_revision) + vs(o.nivel_revision)], ['Rango 52 semanas', n(o.min_52s) === null ? NA : usd(o.min_52s) + ' – ' + usd(o.max_52s)]]
       .forEach(([a, b]) => { const c = el('div'); c.append(el('span', null, a), el('b', null, b)); lv.append(c); });
     R.append(lv);
     R.append(el('h3', null, 'Proyección ' + (o.fy_est || '')));
