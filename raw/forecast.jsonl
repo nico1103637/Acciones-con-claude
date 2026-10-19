@@ -5,6 +5,7 @@
 {"ticker": "DECK", "eps_prox": 8.34, "fy_prox": "FY 2028", "pt_bajo": 70, "pt_mediana": 116, "pt_alto": 184}
 {"ticker": "EXEL", "eps_prox": 4.27, "fy_prox": "FY 2027", "pt_bajo": 41, "pt_mediana": 54, "pt_alto": 70}
 {"ticker": "FSLR", "eps_prox": 23.51, "fy_prox": "FY 2027", "pt_bajo": 191, "pt_mediana": 270, "pt_alto": 402}
+{"ticker": "MLI", "eps_prox": 4.65, "fy_prox": "FY 2027", "pt_bajo": 80, "pt_mediana": 80, "pt_alto": 80}
 {"ticker": "MU", "eps_prox": 204.47, "fy_prox": "FY 2028", "pt_bajo": 361, "pt_mediana": 1550, "pt_alto": 3000}
 {"ticker": "NBIX", "eps_prox": 11.95, "fy_prox": "FY 2027", "pt_bajo": 150, "pt_mediana": 213, "pt_alto": 253}
 {"ticker": "NVDA", "eps_prox": 15.91, "fy_prox": "FY 2028", "pt_bajo": 180, "pt_mediana": 315, "pt_alto": 515}
