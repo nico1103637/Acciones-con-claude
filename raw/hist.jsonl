@@ -48,6 +48,7 @@
 {"ticker": "APP", "fecha": "2026-10-13", "cierre": 272.28}
 {"ticker": "APP", "fecha": "2026-10-14", "cierre": 262.19}
 {"ticker": "APP", "fecha": "2026-10-15", "cierre": 279.29}
+{"ticker": "APP", "fecha": "2026-10-16", "cierre": 266.13}
 {"ticker": "NBIX", "fecha": "2026-08-05", "cierre": 161.5}
 {"ticker": "NBIX", "fecha": "2026-08-06", "cierre": 159.82}
 {"ticker": "NBIX", "fecha": "2026-08-07", "cierre": 163.41}
@@ -99,6 +100,7 @@
 {"ticker": "NBIX", "fecha": "2026-10-13", "cierre": 135.13}
 {"ticker": "NBIX", "fecha": "2026-10-14", "cierre": 135.91}
 {"ticker": "NBIX", "fecha": "2026-10-15", "cierre": 136.95}
+{"ticker": "NBIX", "fecha": "2026-10-16", "cierre": 135.71}
 {"ticker": "NVDA", "fecha": "2026-08-06", "cierre": 218.99}
 {"ticker": "NVDA", "fecha": "2026-08-07", "cierre": 223.96}
 {"ticker": "NVDA", "fecha": "2026-08-10", "cierre": 217.55}
@@ -149,6 +151,7 @@
 {"ticker": "NVDA", "fecha": "2026-10-13", "cierre": 228.52}
 {"ticker": "NVDA", "fecha": "2026-10-14", "cierre": 221.3}
 {"ticker": "NVDA", "fecha": "2026-10-15", "cierre": 217.23}
+{"ticker": "NVDA", "fecha": "2026-10-16", "cierre": 214.13}
 {"ticker": "PLTR", "fecha": "2026-08-07", "cierre": 172.01}
 {"ticker": "PLTR", "fecha": "2026-08-10", "cierre": 175.23}
 {"ticker": "PLTR", "fecha": "2026-08-11", "cierre": 174.94}
@@ -198,3 +201,4 @@
 {"ticker": "PLTR", "fecha": "2026-10-13", "cierre": 208.67}
 {"ticker": "PLTR", "fecha": "2026-10-14", "cierre": 200.97}
 {"ticker": "PLTR", "fecha": "2026-10-15", "cierre": 200.5}
+{"ticker": "PLTR", "fecha": "2026-10-16", "cierre": 186.03}
